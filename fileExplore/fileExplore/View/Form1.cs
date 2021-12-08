@@ -28,9 +28,9 @@ namespace fileExplore
         {
             InitializeComponent();
             PopulateTreeView();
-   /*         bool checkExitsData = dao.CheckExits(dataCheck);
-            if (checkExitsData)
-            {*/
+            bool checkExitsData = dao.CheckExits(dataCheck);
+            if (!checkExitsData)
+            {
                 ListJson.Add(new fileInfo()
                 {
                     name = dataCheck,
@@ -41,11 +41,11 @@ namespace fileExplore
                 Task subThreadForGetAllFile = new Task(() => getAllFileInDriver());
 
                 subThreadForGetAllFile.Start(); // cho tiến trình tìm file chạy 1 thread khác 
-/*        }
-            else
+            }
+            else // choox này sẽ xoắ đi khi hoàn tất #################################################
             {
-                MessageBox.Show(" data da tonmf")
-            }*/
+                MessageBox.Show(" data da ton taij");
+            }
 
             this.treeViewEx.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.treeViewEx_NodeMouseClick);
         }
@@ -480,6 +480,7 @@ namespace fileExplore
         {
 
         }
+
         // END file system watcher
     }
 }

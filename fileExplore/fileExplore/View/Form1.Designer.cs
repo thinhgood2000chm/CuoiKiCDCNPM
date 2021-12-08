@@ -70,9 +70,9 @@ namespace fileExplore
             this.txtPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.txtInfo = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.treeViewEx = new System.Windows.Forms.TreeView();
-            this.txtInfo = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -402,6 +402,17 @@ namespace fileExplore
             this.panel1.Size = new System.Drawing.Size(832, 102);
             this.panel1.TabIndex = 10;
             // 
+            // txtInfo
+            // 
+            this.txtInfo.AutoSize = true;
+            this.txtInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.txtInfo.Location = new System.Drawing.Point(246, 67);
+            this.txtInfo.Name = "txtInfo";
+            this.txtInfo.Size = new System.Drawing.Size(382, 13);
+            this.txtInfo.TabIndex = 9;
+            this.txtInfo.Text = "Hệ thống đang load file trong lần khởi động đầu tiên, vui lòng đợi";
+            // 
             // panel3
             // 
             this.panel3.Controls.Add(this.treeViewEx);
@@ -422,17 +433,6 @@ namespace fileExplore
             this.treeViewEx.Size = new System.Drawing.Size(182, 343);
             this.treeViewEx.TabIndex = 0;
             this.treeViewEx.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewEx_AfterSelect);
-            // 
-            // txtInfo
-            // 
-            this.txtInfo.AutoSize = true;
-            this.txtInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.txtInfo.Location = new System.Drawing.Point(246, 67);
-            this.txtInfo.Name = "txtInfo";
-            this.txtInfo.Size = new System.Drawing.Size(382, 13);
-            this.txtInfo.TabIndex = 9;
-            this.txtInfo.Text = "Hệ thống đang load file trong lần khởi động đầu tiên, vui lòng đợi";
             // 
             // Form1
             // 
