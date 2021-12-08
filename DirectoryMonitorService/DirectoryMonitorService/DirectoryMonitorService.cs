@@ -42,7 +42,6 @@ namespace DirectoryMonitorService
             // init fileSystemWatcher for each drive
             fileSystemWatchers = new FileSystemWatcher[drives.Length*extensions.Length];
 
-            int i = 0;
             foreach (string strDrive in drives)
             {
                 // will be a fileSystemWatcher of each file type. B/c fileSystemWatcher don't support Filters in .Net Framework
@@ -84,7 +83,7 @@ namespace DirectoryMonitorService
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
             // write to file
-            var msg = $"{e.ChangeType} - {e.FullPath} {System.Environment.NewLine}";
+            var msg = $"{e.ChangeType} --- {e.FullPath} {System.Environment.NewLine}";
             // get service location
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             // ignore monitor diretory write log AND recycle bin
@@ -108,7 +107,7 @@ namespace DirectoryMonitorService
 
         private static void OnCreated(object sender, FileSystemEventArgs e)
         {
-            var msg = $"Created: {e.FullPath} {System.Environment.NewLine}";
+            var msg = $"Created --- {e.FullPath} {System.Environment.NewLine}";
 
 
             var serviceLocation = "D:";
@@ -137,7 +136,7 @@ namespace DirectoryMonitorService
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            var msg = $"Deleted: {e.FullPath} {System.Environment.NewLine}";
+            var msg = $"Deleted --- {e.FullPath} {System.Environment.NewLine}";
 
 
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
@@ -158,7 +157,7 @@ namespace DirectoryMonitorService
 
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
-            var msg = $"Renamed: Old: {e.OldFullPath} New: {e.FullPath} {System.Environment.NewLine}";
+            var msg = $"Renamed --- Old: {e.OldFullPath} New: {e.FullPath} {System.Environment.NewLine}";
 
 
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
