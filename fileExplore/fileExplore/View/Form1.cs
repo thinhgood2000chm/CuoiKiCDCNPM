@@ -44,6 +44,7 @@ namespace fileExplore
             }
             else // choox này sẽ xoắ đi khi hoàn tất #################################################
             {
+                txtInfo.Visible = false;
                 MessageBox.Show(" data da ton taij");
             }
 
@@ -124,7 +125,7 @@ namespace fileExplore
                 GetFileInFolder(info);
                 task.Wait();
             }
-            txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
+            txtInfo.Invoke(new Action(() => txtInfo.Visible = false)); 
             btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
 
             // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
