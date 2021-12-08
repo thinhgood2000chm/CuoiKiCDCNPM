@@ -60,7 +60,6 @@
     <Compile Include="View\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GetFile.cs" />
     <Compile Include="View\ProgressDialog.cs">
       <SubType>Form</SubType>
     </Compile>
