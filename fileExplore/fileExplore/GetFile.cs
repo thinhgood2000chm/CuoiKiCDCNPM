@@ -9,7 +9,7 @@ namespace fileExplore
 {
     class GetFile
     {
-        List<file> myJson = new List<file>();
+/*        List<file> myJson = new List<file>();
         public List<file> GetFileInFolder(DirectoryInfo subDir)
         {
             try
@@ -42,6 +42,6 @@ namespace fileExplore
 
             }
             return myJson;
-        }
+        }*/
     }
 }

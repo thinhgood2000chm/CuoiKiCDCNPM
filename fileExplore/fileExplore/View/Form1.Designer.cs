@@ -72,6 +72,7 @@ namespace fileExplore
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.treeViewEx = new System.Windows.Forms.TreeView();
+            this.txtInfo = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -391,13 +392,14 @@ namespace fileExplore
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.txtInfo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.txtPath);
             this.panel1.Controls.Add(this.btnSearch);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(832, 76);
+            this.panel1.Size = new System.Drawing.Size(832, 102);
             this.panel1.TabIndex = 10;
             // 
             // panel3
@@ -420,6 +422,17 @@ namespace fileExplore
             this.treeViewEx.Size = new System.Drawing.Size(182, 343);
             this.treeViewEx.TabIndex = 0;
             this.treeViewEx.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewEx_AfterSelect);
+            // 
+            // txtInfo
+            // 
+            this.txtInfo.AutoSize = true;
+            this.txtInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.txtInfo.Location = new System.Drawing.Point(246, 67);
+            this.txtInfo.Name = "txtInfo";
+            this.txtInfo.Size = new System.Drawing.Size(382, 13);
+            this.txtInfo.TabIndex = 9;
+            this.txtInfo.Text = "Hệ thống đang load file trong lần khởi động đầu tiên, vui lòng đợi";
             // 
             // Form1
             // 
@@ -484,6 +497,7 @@ namespace fileExplore
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.TreeView treeViewEx;
+        private System.Windows.Forms.Label txtInfo;
     }
 }
 

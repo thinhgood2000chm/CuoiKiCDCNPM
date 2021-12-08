@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fileExplore
+namespace fileExplore.Dao
 {
-    class file
+    class fileInfo
     {
         public string name { get; set; }
         public string path { get; set; }

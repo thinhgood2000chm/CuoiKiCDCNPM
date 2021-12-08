@@ -1,28 +1,23 @@
 ﻿using System;
 using Nest;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
-using System.Threading;
 using System.Collections;
-
+using fileExplore.Dao;
 namespace fileExplore
 {
     public partial class Form1 : Form
     {
-        
+
+         
         //FileStream fileStream, fileStreamRoot, fileStreamRead;
-        ConnectionSettings connectionSettings;
-        static ElasticClient elasticClient;
+/*        ConnectionSettings connectionSettings;
+        static ElasticClient elasticClient;*/
         //List<string> pathFiles = new List<string>();
-        List<file> myJson = new List<file>();
+        List<fileInfo> myJson = new List<fileInfo>();
         // FileSystemWatcher
         FileSystemWatcher[] fileSystemWatchers;
         // fix duplicate change event
@@ -31,7 +26,7 @@ namespace fileExplore
 
         bool isProcessRunning = false;
         ProgressDialog progressBar = new ProgressDialog();
-
+        fileDao dao = new fileDao();
         public Form1()
         {
             InitializeComponent();
@@ -44,22 +39,7 @@ namespace fileExplore
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            connectionSettings = new ConnectionSettings(new Uri("http://localhost:9200/")); //local PC           
-            elasticClient = new ElasticClient(connectionSettings);
-
-            // ghi những dữ liệu mà trên elastic chưa có lên server  
-            var bulkIndexResponse = elasticClient.Bulk(b => b
-             .Index("filedatasearch")
-             .IndexMany(myJson)
-               );
-
-            //############################# chỗ này khi hoàn thành phảixóa đi ########################################
-            if (bulkIndexResponse.IsValid)
-            {
-                MessageBox.Show("them thanh cong");
-            }
-            //############################# chỗ này khi hoàn thành phải xóa đi   ########################################
-
+          
             //----------File system watcher: cập nhật thông tin khi có thay đổi file
             // get all drive in computer
             string[] drives = Environment.GetLogicalDrives();
@@ -80,7 +60,6 @@ namespace fileExplore
                 }
                    
 
-                Debug.WriteLine(strDrive);
                 // will be a fileSystemWatcher of each file type. B/c fileSystemWatcher don't support Filters in .Net Framework
                 try
                 {
@@ -122,18 +101,20 @@ namespace fileExplore
         // tiến hành chạy để lấy file gửi lên server 
         public void getAllFileInDriver()
         {
-            DirectoryInfo info = new DirectoryInfo(@"G:\");
+         
+            DirectoryInfo info = new DirectoryInfo(@"G:\test");
             btnSearch.Invoke(new Action(()=> { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
             if (info.Exists)
             {
                 Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
                 task.Start();
-
-
                 GetFileInFolder(info);
                 task.Wait();
             }
+            txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
             btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
+
+            // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
             /*   var ListDriverInfor = DriveInfo.GetDrives();
                for (int i = 0; i < ListDriverInfor.Length; i++)
                {
@@ -157,6 +138,11 @@ namespace fileExplore
 
 
         }*/
+            var bulkIndexResponse = dao.Add(myJson);
+            if (bulkIndexResponse)
+            {
+                MessageBox.Show("them thanh cong");
+            }
 
 
         }
@@ -195,27 +181,26 @@ namespace fileExplore
 
         }
 
-        private List<file> GetFileInFolder(DirectoryInfo subDir)
+        private List<fileInfo> GetFileInFolder(DirectoryInfo subDir)
         {
             try
             {
                 foreach (FileInfo file in subDir.GetFiles())
                 {
-                    áhjkdfgasjhdfgasjhdfasjkhdf
                     // đọc và lấy ra những path có định dạng file là txt, doc, pdf
                     if (file.Extension == ".txt" || file.Extension == ".docx" || file.Extension == ".pdf")
                     {
-                        // đay là mẫu 
+                        string content = File.ReadAllText(file.FullName);
+                        myJson.Add(new fileInfo()
                         {
-                            /*  myJson.Add(new file()
-                              {
-                                  name = file.Name,
-                                  path = file.FullName,
-                                  content = "dư lieu tu c# bulk 123" // cái chỗ này sẽ đọc nội dung file ra nhưng chưa làm tới 
-                              });*/
-                            Debug.WriteLine(file.Name + "path = " + file.FullName);
+                            name = file.Name,
+                            path = file.FullName,
+                            content = content // cái chỗ này sẽ đọc nội dung file ra nhưng chưa làm tới 
+                        });
 
-                        }
+                        Debug.WriteLine(file.Name + "path = " + file.FullName);
+
+                        
                     }
 
                 }
@@ -231,34 +216,13 @@ namespace fileExplore
             return myJson;
 
         }
+
+        // hàm của tree view
         private void PopulateTreeView()
         {
-            // mở file txt và lưu giá trị vào 1 list, list này dùng để so sánh xem có file nào mới được tạo thêm trên máy khi mà 
-            // chương trình đang tắt hay ko, nếu có thì thêm vào file txt, và gửi lên server elastic, nếu ko thì bỏ qua ko gửi gì lên hết 
-            //################################# url chỗ này có thể sẽ sửa lại sau này thanh đường dẫn tương đối#####################
-            /*StreamReader streamReader = new StreamReader(fileStreamRead);
-            string pathFile = streamReader.ReadLine();
-            while (pathFile != null)
-            {
-                if (pathFile.Contains("Created")){
-                    Debug.WriteLine(pathFile);
-                    pathFiles.Add(pathFile); // lưu giá trị đọc từ file vào list
-                }
-                
-                pathFile = streamReader.ReadLine();
-            }
-            streamReader.Close();
-
-            fileStreamRead.Close();
-            Debug.WriteLine(pathFile);
-            foreach(var e in pathFiles)
-            {
-                Debug.WriteLine(e);
-            }*/
             // khởi tạo root gốc trong tree node 
             TreeNode rootNode;
 
-            //###################################### ko được xóa những cái comment này ######################################
             var ListDriverInfor = DriveInfo.GetDrives();// lây tất cả các ổ đĩa ( các ổ đia trong máy, ko bao gồm các file trong ổ đĩa)
             foreach (DriveInfo drive in ListDriverInfor) // bắt đầu tìm kiếm trong các ổ đĩa để lấy ra các folder và các file 
             {
@@ -267,31 +231,16 @@ namespace fileExplore
 
                 if (info.Exists)
                 {
-                    //GetFileInFolder(info);
+                    GetFileInFolder(info);
                     rootNode = new TreeNode(info.Name);// nếu như có tồn tại thư mục con năm trong path ( path là đường dẫn vd khi bắt đầu với ổ c path sẽ là C) 
                     rootNode.ImageIndex = 2;// gắn image cho root node ( đây là image dành cho ổ đĩa c d e ... , các folder được gắn mặc định ) 
                     rootNode.Tag = info;
-                    //GetDirectories(info.GetDirectories(), rootNode);// tìm kiếm các folder bên trong ổ đĩa
-
                     treeViewEx.Nodes.Add(rootNode);// thêm root node vào tree view để tạo ra nhánh của 1 ổ đĩa 
                 }
             }
-
-
-            /*  DirectoryInfo info = new DirectoryInfo(@"G:\");
-              if (info.Exists)
-              {
-
-                  GetFileInFolder(info);
-
-                  rootNode = new TreeNode(info.Name);
-                  rootNode.Tag = info;
-                  //GetDirectories(info.GetDirectories(), rootNode);
-                  rootNode.ImageIndex = 2;
-                  treeViewEx.Nodes.Add(rootNode);
-              }*/
         }
 
+        // hàm lấy tất cả các file và folder con( ko đệ quy )
         private void GetDirectories(DirectoryInfo[] subDirs, TreeNode nodeToAddTo)
         {
          
@@ -304,20 +253,9 @@ namespace fileExplore
                 aNode.Tag = subDir;
                 aNode.ImageKey = "folder";
 
-                GetFileInFolder(subDir);
-
                 try
                 {
-                  /*  subSubDirs = subDir.GetDirectories();
-
-                    if (subSubDirs.Length != 0)
-                    {
-                        //GetDirectories(subSubDirs, aNode);// cái này gọi là đệ quy sau khi tìm xong 1 folder sẽ tiếp tục tìm kiếm lại trong folder con của folder đó xem có còn file hay folder nào nữa ko 
-                    // bắt sự kiện click thì mới gọi đệ quy 
-                    }*/
-                 
                     nodeToAddTo.Nodes.Add(aNode);// add folder vào ổ đĩa 
-              
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -330,9 +268,10 @@ namespace fileExplore
             }
         }
 
-       
+
 
         // thiết lập tree view mỗi khi bấm vào thì list view sẽ chuyển theo ứng vs tree view
+        // khi bấm vào thì đồng thời gọi hàm GetDirectories để tìm kiếm các hàm con bên trong
         private void treeViewEx_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeNode newSelected = e.Node;
@@ -343,8 +282,10 @@ namespace fileExplore
             DirectoryInfo nodeDirInfo = (DirectoryInfo)newSelected.Tag;
             try
             {
+                // bấm vào sẽ tìm kiếm các file và folder con 
                 GetDirectories(nodeDirInfo.GetDirectories(), newSelected);
 
+                // gắn file vào folder con vào list vỉew
                 foreach (DirectoryInfo dir in nodeDirInfo.GetDirectories())
                 {
                     item = new ListViewItem(dir.Name, 0);
@@ -392,6 +333,8 @@ namespace fileExplore
 
         }
 
+
+        // hiện tại sẽ viết tạm ở phần dưới này các chức năng như xóa sửa 
 
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
@@ -449,11 +392,11 @@ namespace fileExplore
                         path = path,
                         content = "dư lieu tu c# bulk"
                     };
-                    var response = elasticClient.Index(myJson, i => i.Index("filedatasearch"));
+                    //var response = elasticClient.Index(myJson, i => i.Index("filedatasearch"));
                     /*var bulkIndexResponse = elasticClient.Bulk(b => b
                                                                  .Index("filedatasearch")
                                                                  .IndexMany(myJson)
-                                                                );*/
+             *//*                                                   );*//*
                     if (response.IsValid)
                     {
                         MessageBox.Show(e.FullPath + " Create success");
@@ -461,7 +404,7 @@ namespace fileExplore
                     else
                     {
                         MessageBox.Show(e.FullPath + " Create not success");
-                    }
+                    }*/
 
                     //--
                     fileWriteTime[path] = currentLastWriteTime;
@@ -530,6 +473,7 @@ namespace fileExplore
 
         }
 
+        // Viết chức năng tìm kiếm
         private void btnSearch_Click(object sender, EventArgs e)
         {
 
