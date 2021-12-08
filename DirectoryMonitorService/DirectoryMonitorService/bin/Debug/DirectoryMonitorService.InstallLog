@@ -1,0 +1,270 @@
+﻿Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+No public installers with the RunInstallerAttribute.Yes attribute could be found in the D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe assembly.
+Committing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+No public installers with the RunInstallerAttribute.Yes attribute could be found in the D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe assembly.
+Remove InstallState file because there are no installers.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+No public installers with the RunInstallerAttribute.Yes attribute could be found in the D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe assembly.
+Committing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+No public installers with the RunInstallerAttribute.Yes attribute could be found in the D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe assembly.
+Remove InstallState file because there are no installers.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Service DirectoryMonitorService has been successfully installed.
+Creating EventLog source DirectoryMonitorService in log Application...
+Committing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.
+Installing assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Installing service DirectoryMonitorService...
+Creating EventLog source DirectoryMonitorService in log Application...
+Rolling back assembly 'D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe'.
+Affected parameters are:
+   i = 
+   logfile = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.InstallLog
+   assemblypath = D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+   logtoconsole = 
+Restoring event log to previous state for source DirectoryMonitorService.

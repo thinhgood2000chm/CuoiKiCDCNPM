@@ -1,0 +1,6 @@
+
+Deleted: D:\ttttttttttt.txt 
+Changed - D:\GAME-OFF\MyTest.txt 
+Changed - D:\log.txt 
+Changed - C:\ProgramData\ASUS\ASUS System Control Interface\AsusSoftwareManager\AsusLiveUpdate\alulist.txt 
+

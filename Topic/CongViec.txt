@@ -1,0 +1,5 @@
+anh Minh: tìm, mở, responsive
+Trâm: xóa
+Đăng: cập nhật
+Thịnh: Chương trình chính
+Bình: chạy ngầm

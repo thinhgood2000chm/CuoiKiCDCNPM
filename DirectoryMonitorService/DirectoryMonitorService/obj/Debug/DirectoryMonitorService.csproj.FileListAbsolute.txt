@@ -1,0 +1,10 @@
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe.config
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.exe
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\bin\Debug\DirectoryMonitorService.pdb
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.DirectoryMonitorService.resources
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.csproj.GenerateResource.cache
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.csproj.CoreCompileInputs.cache
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.exe
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.pdb
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.ProjectInstaller.resources
+D:\504073_AdvancedSE_Project\-N-CDCNPM\DirectoryMonitorService\DirectoryMonitorService\obj\Debug\DirectoryMonitorService.csprojAssemblyReference.cache
