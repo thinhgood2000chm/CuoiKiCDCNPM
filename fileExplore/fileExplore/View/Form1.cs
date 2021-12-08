@@ -11,28 +11,42 @@ namespace fileExplore
 {
     public partial class Form1 : Form
     {
+        // constant
+        string dataCheck = "dataforCheck11231asasdasdqweadaw";
 
-         
-        //FileStream fileStream, fileStreamRoot, fileStreamRead;
-/*        ConnectionSettings connectionSettings;
-        static ElasticClient elasticClient;*/
-        //List<string> pathFiles = new List<string>();
-        List<fileInfo> myJson = new List<fileInfo>();
+        List<fileInfo> ListJson = new List<fileInfo>();
+
         // FileSystemWatcher
         FileSystemWatcher[] fileSystemWatchers;
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
         //static string[] ignoreFolders = { "$RECYCLE.BIN", "\\elasticsearch\\", "\\kibana-elasticsearch\\" };
-
-        bool isProcessRunning = false;
-        ProgressDialog progressBar = new ProgressDialog();
-        fileDao dao = new fileDao();
+        bool isProcessRunning = false; // cái này là của process bar 
+        ProgressDialog progressBar = new ProgressDialog();// cái này là của process bar 
+        static fileDao dao = new fileDao();
         public Form1()
         {
             InitializeComponent();
             PopulateTreeView();
-            Task subThreadForGetAllFile = new Task(()=>getAllFileInDriver());
-            subThreadForGetAllFile.Start(); // cho tiến trình tìm file chạy 1 thread khác 
+            bool checkExitsData = dao.CheckExits(dataCheck);
+            if (!checkExitsData)
+            {
+                ListJson.Add(new fileInfo()
+                {
+                    name = dataCheck,
+                    path = "",
+                    content = "" // cái chỗ này sẽ đọc nội dung file ra nhưng chưa làm tới 
+                });
+
+                Task subThreadForGetAllFile = new Task(() => getAllFileInDriver());
+
+                subThreadForGetAllFile.Start(); // cho tiến trình tìm file chạy 1 thread khác 
+            }
+            else // choox này sẽ xoắ đi khi hoàn tất #################################################
+            {
+                MessageBox.Show(" data da ton taij");
+            }
+
             this.treeViewEx.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.treeViewEx_NodeMouseClick);
         }
 
@@ -55,7 +69,6 @@ namespace fileExplore
             {
                 if (!Directory.Exists(strDrive))
                 {
-                    Debug.WriteLine("da vao");
                     continue;
                 }
                    
@@ -138,7 +151,7 @@ namespace fileExplore
 
 
         }*/
-            var bulkIndexResponse = dao.Add(myJson);
+            var bulkIndexResponse = dao.AddList(ListJson);
             if (bulkIndexResponse)
             {
                 MessageBox.Show("them thanh cong");
@@ -191,7 +204,7 @@ namespace fileExplore
                     if (file.Extension == ".txt" || file.Extension == ".docx" || file.Extension == ".pdf")
                     {
                         string content = File.ReadAllText(file.FullName);
-                        myJson.Add(new fileInfo()
+                        ListJson.Add(new fileInfo()
                         {
                             name = file.Name,
                             path = file.FullName,
@@ -213,7 +226,7 @@ namespace fileExplore
             {
 
             }
-            return myJson;
+            return ListJson;
 
         }
 
@@ -385,28 +398,12 @@ namespace fileExplore
                 {
                     // ghi lên elastic ở đây
                     var name = e.Name;
+                    fileInfo fileUpload = new fileInfo();
+                    fileUpload.name = name;
+                    fileUpload.path = path;
+                    fileUpload.content = File.ReadAllText(path);
+                    dao.Add(fileUpload);
 
-                    var myJson = new
-                    {
-                        name = name,
-                        path = path,
-                        content = "dư lieu tu c# bulk"
-                    };
-                    //var response = elasticClient.Index(myJson, i => i.Index("filedatasearch"));
-                    /*var bulkIndexResponse = elasticClient.Bulk(b => b
-                                                                 .Index("filedatasearch")
-                                                                 .IndexMany(myJson)
-             *//*                                                   );*//*
-                    if (response.IsValid)
-                    {
-                        MessageBox.Show(e.FullPath + " Create success");
-                    }
-                    else
-                    {
-                        MessageBox.Show(e.FullPath + " Create not success");
-                    }*/
-
-                    //--
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
@@ -483,6 +480,7 @@ namespace fileExplore
         {
 
         }
+
         // END file system watcher
     }
 }
