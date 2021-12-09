@@ -41,6 +41,7 @@ namespace fileExplore
                 Task subThreadForGetAllFile = new Task(() => getAllFileInDriver());
 
                 subThreadForGetAllFile.Start(); // cho tiến trình tìm file chạy 1 thread khác 
+                //progressBar.ShowDialog();
             }
             else // choox này sẽ xoắ đi khi hoàn tất #################################################
             {
@@ -95,7 +96,7 @@ namespace fileExplore
                                          | NotifyFilters.Size;
 
                         watcher.Changed += OnChanged;
-                        watcher.Created += OnCreated;
+                        //watcher.Created += OnCreated;
                         watcher.Deleted += OnDeleted;
                         watcher.Renamed += OnRenamed;
 
@@ -115,9 +116,9 @@ namespace fileExplore
         // tiến hành chạy để lấy file gửi lên server 
         public void getAllFileInDriver()
         {
-         
-            DirectoryInfo info = new DirectoryInfo(@"G:\test");
-            btnSearch.Invoke(new Action(()=> { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+
+            DirectoryInfo info = new DirectoryInfo(@"G:\");
+            btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
             if (info.Exists)
             {
                 Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
@@ -125,36 +126,43 @@ namespace fileExplore
                 GetFileInFolder(info);
                 task.Wait();
             }
-            txtInfo.Invoke(new Action(() => txtInfo.Visible = false)); 
-            btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
+
+
 
             // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
-            /*   var ListDriverInfor = DriveInfo.GetDrives();
-               for (int i = 0; i < ListDriverInfor.Length; i++)
-               {
-                   DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
-                   progressBar.UpdateProgress(i, info.GetDirectories().Length);
+            /*  var ListDriverInfor = DriveInfo.GetDrives();
+              btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; }));
+              for (int i = 0; i < ListDriverInfor.Length; i++)
+              {
+                  DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
+                  //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
+                  //progressBar.UpdateProgress(i, info.GetDirectories().Length);
 
-                   if (info.Exists)
-                   { 
+                  if (info.Exists)
+                  {
 
-                       Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                       task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
-                       progressBar.ShowDialog();        //GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
-                       task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
+                      Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                      task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
 
-                   }
+                      GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
+                      task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
 
-                   if (progressBar.InvokeRequired)
-                       progressBar.BeginInvoke(new Action(() => progressBar.Close()));
-
-                   isProcessRunning = false;
+                  }
 
 
-        }*/
+              }*/
+            /* if (progressBar.InvokeRequired)
+                 progressBar.BeginInvoke(new Action(() => progressBar.Close()));
+
+             isProcessRunning = false;*/
+            txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
+            btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
+
             var bulkIndexResponse = dao.AddList(ListJson);
             if (bulkIndexResponse)
             {
+                txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
+                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
                 MessageBox.Show("them thanh cong");
             }
 
@@ -197,10 +205,17 @@ namespace fileExplore
 
         private List<fileInfo> GetFileInFolder(DirectoryInfo subDir)
         {
+            // cứ khoảng 100 data thì gửi lên elasstic và xóa data trong list ( tránh tràn bộ nhớ nếu gửi lên 1 lần) 
+            if (ListJson.Count > 100)
+            {
+                var bulkIndexResponse = dao.AddList(ListJson);
+                ListJson.Clear();
+            }
             try
             {
                 foreach (FileInfo file in subDir.GetFiles())
                 {
+                  
                     // đọc và lấy ra những path có định dạng file là txt, doc, pdf
                     if (file.Extension == ".txt" || file.Extension == ".docx" || file.Extension == ".pdf")
                     {
@@ -380,7 +395,7 @@ namespace fileExplore
             }
         }
 
-        private static void OnCreated(object sender, FileSystemEventArgs e)
+       /* private static void OnCreated(object sender, FileSystemEventArgs e)
         {
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
@@ -409,7 +424,7 @@ namespace fileExplore
                 }
             }
 
-        }
+        }*/
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
