@@ -102,7 +102,7 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
          
-            DirectoryInfo info = new DirectoryInfo(@"G:\test");
+            DirectoryInfo info = new DirectoryInfo(@"D:\");
             btnSearch.Invoke(new Action(()=> { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
             if (info.Exists)
             {

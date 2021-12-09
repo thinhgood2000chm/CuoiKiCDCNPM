@@ -41,7 +41,7 @@ namespace DirectoryMonitorService
 
             // init fileSystemWatcher for each drive
             fileSystemWatchers = new FileSystemWatcher[drives.Length*extensions.Length];
-
+            int i = 0;
             foreach (string strDrive in drives)
             {
                 // will be a fileSystemWatcher of each file type. B/c fileSystemWatcher don't support Filters in .Net Framework
