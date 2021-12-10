@@ -17,15 +17,22 @@ namespace DirectoryMonitorService
     {
         //---- Install window service ----------------------------------------------------------|
         // run as administrator: Developer Command Prompt for VS 2019                           |
-        // cd to folder debug: ...\DirectoryMonitorService\DirectoryMonitorService\bin\Debug    |
-        // installutil.exe -i DirectoryMonitorService.exe                                       |
-        // window + R: services.msc   ->    start DirectoryMonitorService                       |
+        // cd to folder debug:   ...\DirectoryMonitorService\DirectoryMonitorService\bin\Debug  |
+        // install service:      installutil.exe -i DirectoryMonitorService.exe                 |
+        // window + R:           services.msc   ->    start Directory Monitor Service           |
+        //                                                                                      |
+        //                                                                                      |
+        // uninstall service: stop service -> installutil.exe -u DirectoryMonitorService.exe    |
         //--------------------------------------------------------------------------------------|
 
+        // TODO: singleton for write
+        // *docx problem*
+
         FileSystemWatcher[] fileSystemWatchers;
+        // folders you don't want to apply file system watcher
+        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "\\ProgramData\\" , "\\iTProgram\\" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
-        static FileStream fileStream, fileStreamRoot, fileStreamRead;
 
         public DirectoryMonitorService()
         {
@@ -87,7 +94,8 @@ namespace DirectoryMonitorService
             // get service location
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             // ignore monitor diretory write log AND recycle bin
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation) || e.FullPath.Contains("$RECYCLE.BIN");
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 // fix duplicate change event
@@ -109,9 +117,9 @@ namespace DirectoryMonitorService
         {
             var msg = $"Created --- {e.FullPath} {System.Environment.NewLine}";
 
-
-            var serviceLocation = "D:";
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation) || e.FullPath.Contains("$RECYCLE.BIN");
+            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
@@ -120,15 +128,7 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    File.AppendAllText(@"D:\GAME-OFF\MyTest.txt", msg);
-
-                    fileStreamRoot = new FileStream(@"D:\log.txt", FileMode.Append, FileAccess.Write, FileShare.None);
-                    StreamWriter sw = new StreamWriter(fileStreamRoot);
-                    sw.WriteLine(msg);
-                    sw.Flush();
-                    sw.Close();
-                    fileStreamRoot.Close();
-
+                    File.AppendAllText($"{serviceLocation}\\log.txt", msg);
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
@@ -140,7 +140,8 @@ namespace DirectoryMonitorService
 
 
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation) || e.FullPath.Contains("$RECYCLE.BIN");
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
@@ -161,7 +162,8 @@ namespace DirectoryMonitorService
 
 
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation) || e.FullPath.Contains("$RECYCLE.BIN");
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
