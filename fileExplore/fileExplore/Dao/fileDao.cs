@@ -9,10 +9,10 @@ namespace fileExplore.Dao
     {
         static ConnectionSettings connectionSettings = new ConnectionSettings(new Uri("http://localhost:9200/")); //local PC      
         ElasticClient elasticClient = new ElasticClient(connectionSettings);
-        public bool AddList(List<fileInfo> fileInfos)
+        public bool AddList(List<fileInfo> fileInfos,string index)
         {
             var bulkIndexResponse = elasticClient.Bulk(b => b
-               .Index("filedatasearch2")
+               .Index(index)
                .IndexMany(fileInfos)
              );
 
@@ -23,7 +23,7 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public bool Add(fileInfo file)
+        public bool Add(fileInfo file, string index) // add này dùng cho nếu có file tạo mới ( chạy ngầm sẽ dùng)
         {
             var myJson = new
             {
@@ -31,7 +31,7 @@ namespace fileExplore.Dao
                 path = file.path,
                 content = file.content
             };
-            var response = elasticClient.Index(myJson, i => i.Index("filedatasearch2"));
+            var response = elasticClient.Index(myJson, i => i.Index(index));
             if (response.IsValid)
             {
                 return true;
@@ -39,9 +39,9 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public bool CheckExits(string dataCheck)
+        public bool CheckExits(string dataCheck, string index)
         {
-            var response = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            var response = elasticClient.Search<fileInfo>(s => s.Index(index)
              .Query(q => q.Match(m => m.Field("name").Query(dataCheck))));
             if (response.Hits.Count > 0)
             {
