@@ -47,7 +47,7 @@ namespace fileExplore
             {
                 txtInfo.Visible = false;
                 MessageBox.Show(" data da ton taij");
-                btnSearch.Enabled = true;
+                //btnSearch.Enabled = true;
             }
 
             this.treeViewEx.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.treeViewEx_NodeMouseClick);
@@ -119,7 +119,11 @@ namespace fileExplore
         {
 
             DirectoryInfo info = new DirectoryInfo(@"G:\test");
-           // btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+            if (IsHandleCreated)
+            {
+                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+            }
+          
             if (info.Exists)
             {
                 Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
@@ -156,8 +160,12 @@ namespace fileExplore
                  progressBar.BeginInvoke(new Action(() => progressBar.Close()));
 
              isProcessRunning = false;*/
-            txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
-            btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
+            if (IsHandleCreated)
+            {
+                txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
+                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
+            }
+
 
             var bulkIndexResponse = dao.AddList(ListJson);
             if (bulkIndexResponse)
