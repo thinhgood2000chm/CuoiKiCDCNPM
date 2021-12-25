@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Nest;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +47,7 @@ namespace fileExplore
             {
                 txtInfo.Visible = false;
                 MessageBox.Show(" data da ton taij");
+                btnSearch.Enabled = true;
             }
 
             this.treeViewEx.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.treeViewEx_NodeMouseClick);
@@ -117,8 +118,8 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\");
-            btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+            DirectoryInfo info = new DirectoryInfo(@"G:\test");
+           // btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
             if (info.Exists)
             {
                 Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
@@ -320,8 +321,9 @@ namespace fileExplore
                     item = new ListViewItem(dir.Name, 0);
                     subItems = new ListViewItem.ListViewSubItem[]
                         {new ListViewItem.ListViewSubItem(item, "Directory"),
-                        new ListViewItem.ListViewSubItem(item,
-                            dir.LastAccessTime.ToShortDateString())};
+                      /*  new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
                     item.SubItems.AddRange(subItems);
                     listView1.Items.Add(item);
                 }
@@ -330,8 +332,9 @@ namespace fileExplore
                     item = new ListViewItem(file.Name, 1);
                     subItems = new ListViewItem.ListViewSubItem[]
                         { new ListViewItem.ListViewSubItem(item, "File"),
-                        new ListViewItem.ListViewSubItem(item,
-                        file.LastAccessTime.ToShortDateString())};
+                       /* new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,file.FullName)};
 
                     item.SubItems.AddRange(subItems);
                     listView1.Items.Add(item);

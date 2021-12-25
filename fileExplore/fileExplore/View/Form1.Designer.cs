@@ -357,6 +357,7 @@ namespace fileExplore
             // btnSearch
             // 
             this.btnSearch.BackColor = System.Drawing.Color.IndianRed;
+            this.btnSearch.Enabled = false;
             this.btnSearch.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSearch.ForeColor = System.Drawing.Color.Bisque;
             this.btnSearch.Location = new System.Drawing.Point(592, 22);
