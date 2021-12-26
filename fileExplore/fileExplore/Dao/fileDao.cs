@@ -1,7 +1,7 @@
 ﻿using System;
 using Nest;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 
 namespace fileExplore.Dao
 {
@@ -49,6 +49,52 @@ namespace fileExplore.Dao
             }
             return false;
         }
-         
+
+        public string GetId(string oldPath)
+        {
+            //var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            //.Query(q => q.Match(m => m.Field("path")
+            //.Query(oldPath))));
+
+            //var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            //.Query(q => q.Term(p => p.Field("path")
+            //.Value(oldPath))));
+            
+            var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            .Query(q=>q.Term(p=>p.path.Suffix("keyword"),oldPath)));
+
+
+            var id = "";
+            foreach (var hit in res.Hits)
+            {
+                id = hit.Id.ToString();
+                Debug.WriteLine("&&& " + hit.Source.content);
+                Debug.WriteLine("dây là id " + id);
+            }
+            return id;
+
+            //var id = res.Hits.ToString();
+            //Debug.WriteLine("dây là id " + id);
+            //return id;
+
+        }
+        public bool Update(fileInfo file, string id)
+        {
+            //var myJson = new
+            //{
+            //    name = file.name,
+            //    path = file.path,
+            //    content = file.content
+            //};
+            //var id = "3AOh0n0BIYH7gHs0gySL";
+            var res = elasticClient.Update<fileInfo>(id,
+                d => d.Index("filedatasearch2")
+                .Doc(file));
+            if (res.IsValid)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
