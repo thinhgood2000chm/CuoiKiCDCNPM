@@ -508,6 +508,35 @@ namespace fileExplore
 
         }
 
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+
+         
+        }
+
+        private void renameToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            // rename file ở đây ( có thể thiết lập rename theo kiểu khi bấm rename sẽ hiển thị box 
+            // gồm 1 thanh là tên hiện tại 1 thanh để người dùng nhập tên mới 
+            int index = listView1.SelectedItems[0].Index;// lấy ra vị trí khi người dùng click chuột trái vào listview
+            string path = listView1.Items[index].SubItems[2].Text;// lấy ra path ( ngoài path ra có thể lấy các cái khác, chỉ cần thay đổi SubItems[số vị trí muốn lấy 0, 1,2]
+            MessageBox.Show(index.ToString()+ " "+ path);
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // delete file được chọn ở đây 
+            int index = listView1.SelectedItems[0].Index;
+            string path = listView1.Items[index].SubItems[2].Text;
+        }
+
+
+
         // END file system watcher
     }
 }
