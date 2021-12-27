@@ -98,7 +98,7 @@ namespace fileExplore
 
                         watcher.Changed += OnChanged;
                         //watcher.Created += OnCreated;
-                        watcher.Deleted += OnDeleted;
+                        //watcher.Deleted += OnDeleted;
                         watcher.Renamed += OnRenamed;
 
                         fileSystemWatchers[i] = watcher;
@@ -375,7 +375,7 @@ namespace fileExplore
 
 
         // hiện tại sẽ viết tạm ở phần dưới này các chức năng như xóa sửa 
-
+       
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
@@ -383,8 +383,8 @@ namespace fileExplore
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || e.FullPath.Contains("$RECYCLE.BIN")
-                                || e.FullPath.Contains("\\elasticsearch\\")
-                                || e.FullPath.Contains("\\kibana-elasticsearch\\")
+                                || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
+                                || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64")
                                 || e.FullPath.Contains("\\ASUS\\ASUS");
             Debug.WriteLine(serviceLocation);
             Debug.WriteLine(ignoreFolder);
@@ -398,69 +398,76 @@ namespace fileExplore
                     )
                 {
                     // sửa nội dung file trên elastic ở đây
-
-
-                    //---                    
-                    fileWriteTime[path] = currentLastWriteTime;
-                }
-            }
-        }
-
-       /* private static void OnCreated(object sender, FileSystemEventArgs e)
-        {
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || e.FullPath.Contains("$RECYCLE.BIN")
-                                || e.FullPath.Contains("\\elasticsearch\\")
-                                || e.FullPath.Contains("\\kibana-elasticsearch\\")
-                                || e.FullPath.Contains("\\ASUS\\ASUS")
-                                || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
-            if (!ignoreFolder)
-            {
-                var path = e.FullPath;
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
-                {
-                    // ghi lên elastic ở đây
+                    //var id = "3AOh0n0BIYH7gHs0gySL";
                     var name = e.Name;
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
+                    var id = dao.GetId(e.FullPath);
                     fileUpload.content = File.ReadAllText(path);
-                    dao.Add(fileUpload);
-
+                    //fileUpload.content = File.ReadAllText(path);
+                    var a = dao.Update(fileUpload, id);                  
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
-
-        }*/
-
-        private static void OnDeleted(object sender, FileSystemEventArgs e)
-        {
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation) 
-                                || e.FullPath.Contains("$RECYCLE.BIN")
-                                || e.FullPath.Contains("\\elasticsearch\\")
-                                || e.FullPath.Contains("\\kibana-elasticsearch\\")
-                                || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
-            if (!ignoreFolder)
-            {
-                var path = e.FullPath;
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
-                {
-                    // xóa trên elastic ở đây
-                    MessageBox.Show(e.FullPath + " Delete");
-
-                    //---
-                    fileWriteTime[path] = currentLastWriteTime;
-                }
-            }
+            
         }
+
+        /* private static void OnCreated(object sender, FileSystemEventArgs e)
+         {
+             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                 || e.FullPath.Contains("$RECYCLE.BIN")
+                                 || e.FullPath.Contains("\\elasticsearch\\")
+                                 || e.FullPath.Contains("\\kibana-elasticsearch\\")
+                                 || e.FullPath.Contains("\\ASUS\\ASUS")
+                                 || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
+             if (!ignoreFolder)
+             {
+                 var path = e.FullPath;
+                 string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                 if (!fileWriteTime.ContainsKey(path) ||
+                     fileWriteTime[path].ToString() != currentLastWriteTime
+                     )
+                 {
+                     // ghi lên elastic ở đây
+                     var name = e.Name;
+                     fileInfo fileUpload = new fileInfo();
+                     fileUpload.name = name;
+                     fileUpload.path = path;
+                     fileUpload.content = File.ReadAllText(path);
+                     dao.Add(fileUpload);
+
+                     fileWriteTime[path] = currentLastWriteTime;
+                 }
+             }
+
+         }*/
+
+        //private static void OnDeleted(object sender, FileSystemEventArgs e)
+        //{
+        //    var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+        //    bool ignoreFolder = e.FullPath.Contains(serviceLocation) 
+        //                        || e.FullPath.Contains("$RECYCLE.BIN")
+        //                        || e.FullPath.Contains("\\elasticsearch\\")
+        //                        || e.FullPath.Contains("\\kibana-elasticsearch\\")
+        //                        || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
+        //    if (!ignoreFolder)
+        //    {
+        //        var path = e.FullPath;
+        //        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+        //        if (!fileWriteTime.ContainsKey(path) ||
+        //            fileWriteTime[path].ToString() != currentLastWriteTime
+        //            )
+        //        {
+        //            // xóa trên elastic ở đây
+        //            MessageBox.Show(e.FullPath + " Delete");
+
+        //            //---
+        //            fileWriteTime[path] = currentLastWriteTime;
+        //        }
+        //    }
+        //}
 
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
@@ -471,8 +478,8 @@ namespace fileExplore
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || e.FullPath.Contains("$RECYCLE.BIN")
                                 || e.FullPath.Contains("\\Admin\\AppData\\")
-                                || e.FullPath.Contains("\\elasticsearch\\")
-                                || e.FullPath.Contains("\\kibana-elasticsearch\\");
+                                || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
+                                || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64");
             if (!ignoreFolder)
             {
                 var path = e.FullPath;
@@ -482,7 +489,14 @@ namespace fileExplore
                     )
                 {
                     // đổi tên e.OldFullPath thành e.FullPath trên elastic ở đây
-
+                    var name = e.Name;
+                    fileInfo fileUpload = new fileInfo();
+                    fileUpload.name = name;
+                    fileUpload.path = path;
+                    var id = dao.GetId(e.OldFullPath);
+                    //System.Diagnostics.Process.Start(path);
+                    fileUpload.content = File.ReadAllText(path);
+                    var a = dao.Update(fileUpload, id);
                     MessageBox.Show(e.FullPath + " Rename");
 
 
