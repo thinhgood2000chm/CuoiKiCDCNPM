@@ -399,16 +399,13 @@ namespace fileExplore
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // sửa nội dung file trên elastic ở đây
-                    //var id = "3AOh0n0BIYH7gHs0gySL";
                     var name = e.Name;
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
                     var id = dao.GetId(e.FullPath);
                     fileUpload.content = File.ReadAllText(path);
-                    //fileUpload.content = File.ReadAllText(path);
-                    var a = dao.Update(fileUpload, id);                  
+                    dao.Update(fileUpload, id);                  
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
@@ -490,15 +487,13 @@ namespace fileExplore
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // đổi tên e.OldFullPath thành e.FullPath trên elastic ở đây
                     var name = e.Name;
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
                     var id = dao.GetId(e.OldFullPath);
-                    //System.Diagnostics.Process.Start(path);
                     fileUpload.content = File.ReadAllText(path);
-                    var a = dao.Update(fileUpload, id);
+                    dao.Update(fileUpload, id);
                     MessageBox.Show(e.FullPath + " Rename");
 
 
@@ -554,13 +549,8 @@ namespace fileExplore
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // delete file được chọn ở đây 
             int index = listView1.SelectedItems[0].Index;
             string path = listView1.Items[index].SubItems[2].Text;
         }
-
-
-
-        // END file system watcher
     }
 }
