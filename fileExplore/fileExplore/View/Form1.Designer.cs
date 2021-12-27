@@ -73,7 +73,6 @@ namespace fileExplore
             this.txtInfo = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.treeViewEx = new System.Windows.Forms.TreeView();
-            this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -130,7 +129,7 @@ namespace fileExplore
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1248, 35);
+            this.menuStrip1.Size = new System.Drawing.Size(1248, 33);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -397,13 +396,12 @@ namespace fileExplore
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.txtInfo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.txtPath);
             this.panel1.Controls.Add(this.btnSearch);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 35);
+            this.panel1.Location = new System.Drawing.Point(0, 33);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1248, 157);
@@ -443,16 +441,6 @@ namespace fileExplore
             this.treeViewEx.Size = new System.Drawing.Size(271, 526);
             this.treeViewEx.TabIndex = 0;
             this.treeViewEx.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewEx_AfterSelect);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(46, 51);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 37);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -519,7 +507,6 @@ namespace fileExplore
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.TreeView treeViewEx;
         private System.Windows.Forms.Label txtInfo;
-        private System.Windows.Forms.Button button1;
     }
 }
 

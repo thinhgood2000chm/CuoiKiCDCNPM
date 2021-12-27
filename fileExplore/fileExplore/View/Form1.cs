@@ -511,24 +511,7 @@ namespace fileExplore
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //var id = "2QOh0n0BIYH7gHs0gySL";
-            ////var name = e.Name;
-            //fileInfo fileUpload = new fileInfo();
-            //fileUpload.name = "123";
-            //fileUpload.path = "test";
-            ////fileUpload.content = File.ReadAllText(path);
-            //var a = dao.Update(fileUpload,id);
-            //if (a)
-            //{
-            //    Debug.WriteLine("123");
-            //}
-            //else
-            //{
-            //    Debug.WriteLine("loi");
-            //}
-        }
+        
 
         // END file system watcher
     }
