@@ -73,21 +73,10 @@ namespace fileExplore.Dao
             }
             return id;
 
-            //var id = res.Hits.ToString();
-            //Debug.WriteLine("dây là id " + id);
-            //return id;
-
         }
         public bool Update(fileInfo file, string id)
         {
-            //var myJson = new
-            //{
-            //    name = file.name,
-            //    path = file.path,
-            //    content = file.content
-            //};
-            //var id = "3AOh0n0BIYH7gHs0gySL";
-            var res = elasticClient.Update<fileInfo>(id,
+           var res = elasticClient.Update<fileInfo>(id,
                 d => d.Index("filedatasearch2")
                 .Doc(file));
             if (res.IsValid)

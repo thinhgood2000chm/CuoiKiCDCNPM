@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Collections;
 using fileExplore.Dao;
-using fileExplore.View;
 
 namespace fileExplore
 {
@@ -28,6 +27,8 @@ namespace fileExplore
         static fileDao dao = new fileDao();
         //list kiểm tra dã bấm vào cây hay chưa
         List<string> listPath = new List<string>();
+        //biến dùng để luuw lại thông tin của parent root trước đó
+        DirectoryInfo parentDirInfo;
         public Form1()
         {
             InitializeComponent();
@@ -118,6 +119,21 @@ namespace fileExplore
             }
             //END File system watcher-------
         }
+        public static string ReadFile(string path)
+        {
+            string content;
+            try
+            {
+                content = File.ReadAllText(path);
+                return content;
+            }
+            catch (FileNotFoundException)
+            {
+
+            }
+            return "";
+        }
+
         // tiến hành chạy để lấy file gửi lên server 
         public void getAllFileInDriver()
         {
@@ -317,11 +333,9 @@ namespace fileExplore
         private void treeViewEx_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeNode newSelected = e.Node;
-            listView1.Items.Clear();
-            ListViewItem.ListViewSubItem[] subItems;
-            ListViewItem item = null;
-
             DirectoryInfo nodeDirInfo = (DirectoryInfo)newSelected.Tag;
+            parentDirInfo = nodeDirInfo; // lưu lại parent root để truy suất ngược lại khi cần ( dùng khi muốn load lại listview)
+            
             try
             {
                 // kiểm tra xem nếu nhánh của cây đã được bấm vào rồi thì khi bấm vào lần 2 trở lên sẽ ko gọi để quy nữa ( tránh tạo ra nhiều nhánh trùng)
@@ -333,33 +347,8 @@ namespace fileExplore
                     GetDirectories(nodeDirInfo.GetDirectories(), newSelected);
                 }
 
-
-
-
-                    // gắn file vào folder con vào list vỉew
-                foreach (DirectoryInfo dir in nodeDirInfo.GetDirectories())
-                {
-                    item = new ListViewItem(dir.Name, 0);
-                    subItems = new ListViewItem.ListViewSubItem[]
-                        {new ListViewItem.ListViewSubItem(item, "Directory"),
-                      /*  new ListViewItem.ListViewSubItem(item,
-                            dir.LastAccessTime.ToShortDateString()),*/
-                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
-                    item.SubItems.AddRange(subItems);
-                    listView1.Items.Add(item);
-                }
-                foreach (FileInfo file in nodeDirInfo.GetFiles())
-                {
-                    item = new ListViewItem(file.Name, 1);
-                    subItems = new ListViewItem.ListViewSubItem[]
-                        { new ListViewItem.ListViewSubItem(item, "File"),
-                       /* new ListViewItem.ListViewSubItem(item,
-                        file.LastAccessTime.ToShortDateString()),*/
-                        new ListViewItem.ListViewSubItem(item,file.FullName)};
-
-                    item.SubItems.AddRange(subItems);
-                    listView1.Items.Add(item);
-                }
+                // gắn file vào folder con vào list vỉew
+                AddItemToListView(nodeDirInfo);
 
                 listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
@@ -373,8 +362,6 @@ namespace fileExplore
             }
 
         }
-
-
 
         private void treeViewEx_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -392,34 +379,42 @@ namespace fileExplore
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
-            // không cập nhật trong những ignoreFolder ------ sẽ cập nhật cách kiểm tra "sạch hơn" sau
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || e.FullPath.Contains("$RECYCLE.BIN")
-                                || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
-                                || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64")
-                                || e.FullPath.Contains("\\ASUS\\ASUS");
-            Debug.WriteLine(serviceLocation);
-            Debug.WriteLine(ignoreFolder);
-            if (!ignoreFolder)
-            {
-                // sữa lỗi ghi 2 lần một thông tin
-                var path = e.FullPath;
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
+            try
+            {    
+                // không cập nhật trong những ignoreFolder ------ sẽ cập nhật cách kiểm tra "sạch hơn" sau
+                var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                    || e.FullPath.Contains("$RECYCLE.BIN")
+                                    || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
+                                    || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64")
+                                    || e.FullPath.Contains("\\ASUS\\ASUS");
+                Debug.WriteLine(serviceLocation);
+                Debug.WriteLine(ignoreFolder);
+                if (!ignoreFolder)
                 {
-                    var name = e.Name;
-                    fileInfo fileUpload = new fileInfo();
-                    fileUpload.name = name;
-                    fileUpload.path = path;
-                    var id = dao.GetId(e.FullPath);
-                    fileUpload.content = File.ReadAllText(path);
-                    dao.Update(fileUpload, id);                  
-                    fileWriteTime[path] = currentLastWriteTime;
+                    // sữa lỗi ghi 2 lần một thông tin
+                    var path = e.FullPath;
+                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                    if (!fileWriteTime.ContainsKey(path) ||
+                        fileWriteTime[path].ToString() != currentLastWriteTime
+                        )
+                    {
+                        var name = e.Name;
+                        fileInfo fileUpload = new fileInfo();
+                        fileUpload.name = name;
+                        fileUpload.path = path;
+                        //var id = dao.GetId(e.FullPath);
+                        fileUpload.content = File.ReadAllText(path);
+                        //dao.Update(fileUpload, id);                  
+                        fileWriteTime[path] = currentLastWriteTime;
+                    }
                 }
             }
+            catch (FileNotFoundException)
+            {
+
+            }
+       
             
         }
 
@@ -502,9 +497,10 @@ namespace fileExplore
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
-                    var id = dao.GetId(e.OldFullPath);
-                    fileUpload.content = File.ReadAllText(path);
-                    dao.Update(fileUpload, id);
+                    //var id = dao.GetId(e.OldFullPath);
+                    fileUpload.content = ReadFile(path);
+
+                    //dao.Update(fileUpload, id);
                     MessageBox.Show(e.FullPath + " Rename");
 
 
@@ -543,26 +539,41 @@ namespace fileExplore
 
         private void renameToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            listView1.SelectedItems[0].EnsureVisible();
-            int index = listView1.SelectedItems[0].Index;
-            listView1.LabelEdit=true;
-            // rename file ở đây ( có thể thiết lập rename theo kiểu khi bấm rename sẽ hiển thị box 
-            // gồm 1 thanh là tên hiện tại 1 thanh để người dùng nhập tên mới 
-            /* int index = listView1.SelectedItems[0].Index;// lấy ra vị trí khi người dùng click chuột trái vào listview
-             string path = listView1.Items[index].SubItems[2].Text;// lấy ra path ( ngoài path ra có thể lấy các cái khác, chỉ cần thay đổi SubItems[số vị trí muốn lấy 0, 1,2]
-             string name = listView1.Items[index].SubItems[0].Text;
-             MessageBox.Show(index.ToString()+ " "+ path);
-             string pathNotIncludeName = path.Substring(0, path.Length - name.Length);
-
-             RenameFile formRename = new RenameFile(name,pathNotIncludeName);
-             formRename.ShowDialog();*/
-
+            if (listView1.SelectedItems.Count > 0)
+            {
+                listView1.SelectedItems[0].BeginEdit();// cho phép edit trên listview
+            }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int index = listView1.SelectedItems[0].Index;
-            string path = listView1.Items[index].SubItems[2].Text;
+            DialogResult dialogResult = MessageBox.Show("Bạn có muốn xóa?",
+                   "Delete",
+                   MessageBoxButtons.YesNo,
+                   MessageBoxIcon.Exclamation
+               );
+            if (dialogResult == DialogResult.Yes)
+            {
+                if (listView1.SelectedItems.Count > 0)
+                {
+                    Debug.WriteLine(parentDirInfo);
+                    int index = listView1.SelectedItems[0].Index;
+                    string path = listView1.Items[index].SubItems[2].Text;
+                    string type = listView1.Items[index].SubItems[1].Text;
+                    if (type == "Directory")
+                    {
+                        System.IO.Directory.Delete(path, true);
+                        listView1.Refresh();
+                        AddItemToListView(parentDirInfo);
+                    }
+                    else
+                    {
+                        File.Delete(path);
+                        AddItemToListView(parentDirInfo);
+                    }
+                }
+            }
+         
         }
 
         private void listView1_AfterLabelEdit(object sender, LabelEditEventArgs e)
@@ -581,5 +592,37 @@ namespace fileExplore
             Debug.WriteLine(newName);
             System.IO.File.Move(@"" + oldPath, @"" + pathNotIncludeName + newName);
         }
+        
+        public void AddItemToListView(DirectoryInfo nodeDirInfo)
+        {
+            listView1.Items.Clear();
+            ListViewItem.ListViewSubItem[] subItems;
+            ListViewItem item = null;
+
+            foreach (DirectoryInfo dir in parentDirInfo.GetDirectories())
+            {
+                item = new ListViewItem(dir.Name, 0);
+                subItems = new ListViewItem.ListViewSubItem[]
+                    {new ListViewItem.ListViewSubItem(item, "Directory"),
+                      /*  new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
+                item.SubItems.AddRange(subItems);
+                listView1.Items.Add(item);
+            }
+            foreach (FileInfo file in parentDirInfo.GetFiles())
+            {
+                item = new ListViewItem(file.Name, 1);
+                subItems = new ListViewItem.ListViewSubItem[]
+                    { new ListViewItem.ListViewSubItem(item, "File"),
+                       /* new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,file.FullName)};
+
+                item.SubItems.AddRange(subItems);
+                listView1.Items.Add(item);
+            }
+        }
+       
     }
 }
