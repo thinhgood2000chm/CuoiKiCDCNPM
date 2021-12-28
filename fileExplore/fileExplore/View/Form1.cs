@@ -543,18 +543,19 @@ namespace fileExplore
 
         private void renameToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-
-       
+            listView1.SelectedItems[0].EnsureVisible();
+            int index = listView1.SelectedItems[0].Index;
+            listView1.LabelEdit=true;
             // rename file ở đây ( có thể thiết lập rename theo kiểu khi bấm rename sẽ hiển thị box 
             // gồm 1 thanh là tên hiện tại 1 thanh để người dùng nhập tên mới 
-            int index = listView1.SelectedItems[0].Index;// lấy ra vị trí khi người dùng click chuột trái vào listview
-            string path = listView1.Items[index].SubItems[2].Text;// lấy ra path ( ngoài path ra có thể lấy các cái khác, chỉ cần thay đổi SubItems[số vị trí muốn lấy 0, 1,2]
-            string name = listView1.Items[index].SubItems[0].Text;
-            MessageBox.Show(index.ToString()+ " "+ path);
-            string pathNotIncludeName = path.Substring(0, path.Length - name.Length);
-            
-            RenameFile formRename = new RenameFile(name,pathNotIncludeName);
-            formRename.ShowDialog();
+            /* int index = listView1.SelectedItems[0].Index;// lấy ra vị trí khi người dùng click chuột trái vào listview
+             string path = listView1.Items[index].SubItems[2].Text;// lấy ra path ( ngoài path ra có thể lấy các cái khác, chỉ cần thay đổi SubItems[số vị trí muốn lấy 0, 1,2]
+             string name = listView1.Items[index].SubItems[0].Text;
+             MessageBox.Show(index.ToString()+ " "+ path);
+             string pathNotIncludeName = path.Substring(0, path.Length - name.Length);
+
+             RenameFile formRename = new RenameFile(name,pathNotIncludeName);
+             formRename.ShowDialog();*/
 
         }
 
@@ -562,6 +563,23 @@ namespace fileExplore
         {
             int index = listView1.SelectedItems[0].Index;
             string path = listView1.Items[index].SubItems[2].Text;
+        }
+
+        private void listView1_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            string oldname = listView1.Items[listView1.SelectedIndices[0]].SubItems[0].Text;
+            string oldPath = listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text;
+            string pathNotIncludeName = oldPath.Substring(0, oldPath.Length - oldname.Length);
+            string newName = e.Label;
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                e.CancelEdit = true;
+                MessageBox.Show("Please enter a valid value.");
+                return;
+            }
+
+            Debug.WriteLine(newName);
+            System.IO.File.Move(@"" + oldPath, @"" + pathNotIncludeName + newName);
         }
     }
 }
