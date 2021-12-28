@@ -26,6 +26,8 @@ namespace fileExplore
         bool isProcessRunning = false; // cái này là của process bar 
         ProgressDialog progressBar = new ProgressDialog();// cái này là của process bar 
         static fileDao dao = new fileDao();
+        //list kiểm tra dã bấm vào cây hay chưa
+        List<string> listPath = new List<string>();
         public Form1()
         {
             InitializeComponent();
@@ -322,10 +324,19 @@ namespace fileExplore
             DirectoryInfo nodeDirInfo = (DirectoryInfo)newSelected.Tag;
             try
             {
-                // bấm vào sẽ tìm kiếm các file và folder con 
-                GetDirectories(nodeDirInfo.GetDirectories(), newSelected);
+                // kiểm tra xem nếu nhánh của cây đã được bấm vào rồi thì khi bấm vào lần 2 trở lên sẽ ko gọi để quy nữa ( tránh tạo ra nhiều nhánh trùng)
+                if (!listPath.Contains(nodeDirInfo.FullName))
+                {
+                    // nếu không có trong list thì add vào list
+                    listPath.Add(nodeDirInfo.FullName);
+                    // bấm vào sẽ tìm kiếm các file và folder con 
+                    GetDirectories(nodeDirInfo.GetDirectories(), newSelected);
+                }
 
-                // gắn file vào folder con vào list vỉew
+
+
+
+                    // gắn file vào folder con vào list vỉew
                 foreach (DirectoryInfo dir in nodeDirInfo.GetDirectories())
                 {
                     item = new ListViewItem(dir.Name, 0);
