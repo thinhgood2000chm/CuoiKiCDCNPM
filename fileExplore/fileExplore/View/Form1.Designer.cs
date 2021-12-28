@@ -76,6 +76,7 @@ namespace fileExplore
             this.txtInfo = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.treeViewEx = new System.Windows.Forms.TreeView();
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -95,12 +96,13 @@ namespace fileExplore
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
-            this.columnHeader3});
+            this.columnHeader3,
+            this.columnHeader4});
             this.listView1.ContextMenuStrip = this.contextMenuStrip1;
             this.listView1.HideSelection = false;
             this.listView1.LabelEdit = true;
             this.listView1.Location = new System.Drawing.Point(198, 15);
-            this.listView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.listView1.Margin = new System.Windows.Forms.Padding(2);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(620, 343);
             this.listView1.SmallImageList = this.imageList1;
@@ -114,17 +116,16 @@ namespace fileExplore
             // columnHeader1
             // 
             this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 350;
+            this.columnHeader1.Width = 200;
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Type";
-            this.columnHeader2.Width = 170;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "Last Modified";
-            this.columnHeader3.Width = 200;
+            this.columnHeader3.Width = 150;
             // 
             // contextMenuStrip1
             // 
@@ -466,6 +467,11 @@ namespace fileExplore
             this.treeViewEx.TabIndex = 0;
             this.treeViewEx.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewEx_AfterSelect);
             // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Path";
+            this.columnHeader4.Width = 200;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -534,6 +540,7 @@ namespace fileExplore
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
     }
 }
 

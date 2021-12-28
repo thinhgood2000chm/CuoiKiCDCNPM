@@ -350,7 +350,7 @@ namespace fileExplore
                 // gắn file vào folder con vào list vỉew
                 AddItemToListView(nodeDirInfo);
 
-                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
             catch(UnauthorizedAccessException)
             {
@@ -604,8 +604,8 @@ namespace fileExplore
                 item = new ListViewItem(dir.Name, 0);
                 subItems = new ListViewItem.ListViewSubItem[]
                     {new ListViewItem.ListViewSubItem(item, "Directory"),
-                      /*  new ListViewItem.ListViewSubItem(item,
-                            dir.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),
                         new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
                 item.SubItems.AddRange(subItems);
                 listView1.Items.Add(item);
@@ -615,8 +615,8 @@ namespace fileExplore
                 item = new ListViewItem(file.Name, 1);
                 subItems = new ListViewItem.ListViewSubItem[]
                     { new ListViewItem.ListViewSubItem(item, "File"),
-                       /* new ListViewItem.ListViewSubItem(item,
-                        file.LastAccessTime.ToShortDateString()),*/
+                        new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),
                         new ListViewItem.ListViewSubItem(item,file.FullName)};
 
                 item.SubItems.AddRange(subItems);
