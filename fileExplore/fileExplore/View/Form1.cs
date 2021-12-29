@@ -583,7 +583,7 @@ namespace fileExplore
                 {
                     Debug.WriteLine(parentDirInfo);
                     int index = listView1.SelectedItems[0].Index;
-                    string path = listView1.Items[index].SubItems[2].Text;
+                    string path = listView1.Items[index].SubItems[3].Text;
                     string type = listView1.Items[index].SubItems[1].Text;
                     if (type == "Directory")
                     {
@@ -604,7 +604,7 @@ namespace fileExplore
         private void listView1_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
             string oldname = listView1.Items[listView1.SelectedIndices[0]].SubItems[0].Text;
-            string oldPath = listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text;
+            string oldPath = listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text;
             string pathNotIncludeName = oldPath.Substring(0, oldPath.Length - oldname.Length);
             string newName = e.Label;
             if (string.IsNullOrWhiteSpace(newName))
