@@ -52,26 +52,21 @@ namespace fileExplore.Dao
 
         public string GetId(string oldPath)
         {
-            //var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
-            //.Query(q => q.Match(m => m.Field("path")
-            //.Query(oldPath))));
-
-            //var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
-            //.Query(q => q.Term(p => p.Field("path")
-            //.Value(oldPath))));
-            
             var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
             .Query(q=>q.Term(p=>p.path.Suffix("keyword"),oldPath)));
 
 
             var id = "";
-            foreach (var hit in res.Hits)
+            if (res.Hits.Count > 0)
             {
-                id = hit.Id.ToString();
-                Debug.WriteLine("&&& " + hit.Source.content);
-                Debug.WriteLine("dây là id " + id);
+                foreach (var hit in res.Hits)
+                {
+                    id = hit.Id.ToString();
+                }
+                return id;
             }
-            return id;
+            return null;
+          
 
         }
         public bool Update(fileInfo file, string id)

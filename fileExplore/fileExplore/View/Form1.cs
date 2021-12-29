@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Collections;
 using fileExplore.Dao;
+using Microsoft.VisualBasic;
 
 namespace fileExplore
 {
@@ -124,10 +125,21 @@ namespace fileExplore
             string content;
             try
             {
-                content = File.ReadAllText(path);
-                return content;
+                if (!path.Contains(".tmp")){// bỏ qua file tmp khi word đang được thay đổi
+                    content = File.ReadAllText(path);
+                    return content;
+                }
+  
             }
             catch (FileNotFoundException)
+            {
+
+            }
+            catch (UnauthorizedAccessException)
+            {
+
+            }
+            catch (IOException)
             {
 
             }
@@ -138,7 +150,7 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"D:\Test\Test 1\Child 1");
+            DirectoryInfo info = new DirectoryInfo(@"G:\test");
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
@@ -234,6 +246,7 @@ namespace fileExplore
 
         private List<fileInfo> GetFileInFolder(DirectoryInfo subDir)
         {
+
             // cứ khoảng 100 data thì gửi lên elasstic và xóa data trong list ( tránh tràn bộ nhớ nếu gửi lên 1 lần) 
             if (ListJson.Count > 100)
             {
@@ -404,7 +417,7 @@ namespace fileExplore
                         fileUpload.name = name;
                         fileUpload.path = path;
                         //var id = dao.GetId(e.FullPath);
-                        fileUpload.content = File.ReadAllText(path);
+                        fileUpload.content = ReadFile(path);
                         //dao.Update(fileUpload, id);                  
                         fileWriteTime[path] = currentLastWriteTime;
                     }
@@ -449,30 +462,6 @@ namespace fileExplore
 
          }*/
 
-        //private static void OnDeleted(object sender, FileSystemEventArgs e)
-        //{
-        //    var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-        //    bool ignoreFolder = e.FullPath.Contains(serviceLocation) 
-        //                        || e.FullPath.Contains("$RECYCLE.BIN")
-        //                        || e.FullPath.Contains("\\elasticsearch\\")
-        //                        || e.FullPath.Contains("\\kibana-elasticsearch\\")
-        //                        || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
-        //    if (!ignoreFolder)
-        //    {
-        //        var path = e.FullPath;
-        //        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-        //        if (!fileWriteTime.ContainsKey(path) ||
-        //            fileWriteTime[path].ToString() != currentLastWriteTime
-        //            )
-        //        {
-        //            // xóa trên elastic ở đây
-        //            MessageBox.Show(e.FullPath + " Delete");
-
-        //            //---
-        //            fileWriteTime[path] = currentLastWriteTime;
-        //        }
-        //    }
-        //}
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
@@ -559,7 +548,6 @@ namespace fileExplore
         private void listView1_MouseClick(object sender, MouseEventArgs e)
         {
 
-         
         }
 
         private void renameToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -607,7 +595,7 @@ namespace fileExplore
             string oldPath = listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text;
             string pathNotIncludeName = oldPath.Substring(0, oldPath.Length - oldname.Length);
             string newName = e.Label;
-            if (string.IsNullOrWhiteSpace(newName))
+            if (string.IsNullOrEmpty(newName))
             {
                 e.CancelEdit = true;
                 MessageBox.Show("Please enter a valid value.");
@@ -648,6 +636,72 @@ namespace fileExplore
                 listView1.Items.Add(item);
             }
         }
-       
+        // tạo file
+        private void newFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(parentDirInfo != null)
+            {
+                string path = parentDirInfo.FullName;
+                string fileName = Interaction.InputBox("Enter file's name", "Create new file", "New Text Document.txt", 400, 300);
+                if (fileName != null)
+                {
+                    // kiểm tra xem có file nào có tên vừa nhập vào new file hay chưa 
+                    foreach (FileInfo file in parentDirInfo.GetFiles())
+                    {
+              
+                        if (file.Name == fileName)
+                        {   
+                            // nếu có thì dừng 
+                            MessageBox.Show("File's name is exist");
+                            return;
+                        
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(fileName))
+                    {
+                        var created = File.Create($@"{path}\{fileName}");
+                        created.Close(); // create file bằng File bắt buộc phải close nếu koi thì sẽ ko thể sử dụng ở nơi khác do process đang được sử dụng
+                        AddItemToListView(parentDirInfo);
+                    }
+                    else 
+                    {
+                        return;
+                    }
+
+                }
+
+            }
+
+        }
+        // tạo folder
+        private void newFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (parentDirInfo != null)
+            {
+                string path = parentDirInfo.FullName;
+                string fileName = Interaction.InputBox("Enter file's name", "Create new file", "New folder", 400, 300);
+                string newFolderPath = $@"{path}\{fileName}";
+                bool exists = System.IO.Directory.Exists(newFolderPath);
+                if (!exists)
+                {
+                   var folder =  Directory.CreateDirectory(newFolderPath);
+                    AddItemToListView(parentDirInfo);
+                }
+                else
+                {
+                    MessageBox.Show("Folder exists");
+                    return;
+                }
+            }
+        }
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            int index = listView1.SelectedItems[0].Index;
+            string path = listView1.Items[index].SubItems[3].Text;
+            Process.Start(path);
+        }
+
+
     }
 }
