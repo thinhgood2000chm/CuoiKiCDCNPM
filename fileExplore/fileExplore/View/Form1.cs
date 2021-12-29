@@ -103,7 +103,7 @@ namespace fileExplore
 
                         watcher.Changed += OnChanged;
                         //watcher.Created += OnCreated;
-                        //watcher.Deleted += OnDeleted;
+                        watcher.Deleted += OnDeleted;
                         watcher.Renamed += OnRenamed;
 
                         fileSystemWatchers[i] = watcher;
@@ -138,7 +138,7 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\test");
+            DirectoryInfo info = new DirectoryInfo(@"D:\Test\Test 1\Child 1");
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
@@ -473,7 +473,32 @@ namespace fileExplore
         //        }
         //    }
         //}
-
+        private static void OnDeleted(object sender, FileSystemEventArgs e)
+        {
+            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || e.FullPath.Contains("$RECYCLE.BIN")
+                                || e.FullPath.Contains("C:\\Users\\Tramm\\Downloads\\Programs\\ElasticSearch\\elasticsearch-7.16.1-windows-x86_64")
+                                || e.FullPath.Contains("C:\\Users\\Tramm\\Downloads\\Programs\\ElasticSearch\\kibana-7.16.1-windows-x86_64")
+                                || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
+            if (!ignoreFolder)
+            {
+                var path = e.FullPath;
+                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                if (!fileWriteTime.ContainsKey(path) ||
+                    fileWriteTime[path].ToString() != currentLastWriteTime
+                    )
+                {
+                    // xóa trên elastic ở đây
+                    MessageBox.Show(e.FullPath + " Delete");
+                    var id = dao.GetId(path);
+                    dao.Deleted(id);
+                    //---
+                    fileWriteTime[path] = currentLastWriteTime;
+                    fileWriteTime[path] = currentLastWriteTime;
+                }
+            }
+        }
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
             var msg = $"Renamed: Old: {e.OldFullPath} New: {e.FullPath} {System.Environment.NewLine}";
