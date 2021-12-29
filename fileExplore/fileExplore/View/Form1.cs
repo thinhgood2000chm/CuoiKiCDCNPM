@@ -8,6 +8,9 @@ using System.Diagnostics;
 using System.Collections;
 using fileExplore.Dao;
 using Microsoft.VisualBasic;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
+using System.Text;
 
 namespace fileExplore
 {
@@ -261,7 +264,17 @@ namespace fileExplore
                     // đọc và lấy ra những path có định dạng file là txt, doc, pdf
                     if (file.Extension == ".txt" || file.Extension == ".docx" || file.Extension == ".pdf")
                     {
-                        string content = File.ReadAllText(file.FullName);
+                        string content = "";
+                        if(file.Extension == ".pdf")
+                        {
+                            Debug.WriteLine("da vao");
+                            content = GetTextFromPDF(file.FullName);
+                        }
+                        else
+                        {
+                            content = File.ReadAllText(file.FullName);
+                        }
+     
                         ListJson.Add(new fileInfo()
                         {
                             name = file.Name,
@@ -381,12 +394,6 @@ namespace fileExplore
 
         }
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
         // hiện tại sẽ viết tạm ở phần dưới này các chức năng như xóa sửa 
        
         //--- file system watcher
@@ -395,7 +402,7 @@ namespace fileExplore
             try
             {    
                 // không cập nhật trong những ignoreFolder ------ sẽ cập nhật cách kiểm tra "sạch hơn" sau
-                var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                var serviceLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
                 bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                     || e.FullPath.Contains("$RECYCLE.BIN")
                                     || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
@@ -464,7 +471,7 @@ namespace fileExplore
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            var serviceLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || e.FullPath.Contains("$RECYCLE.BIN")
                                 || e.FullPath.Contains("C:\\Users\\Tramm\\Downloads\\Programs\\ElasticSearch\\elasticsearch-7.16.1-windows-x86_64")
@@ -493,7 +500,7 @@ namespace fileExplore
             var msg = $"Renamed: Old: {e.OldFullPath} New: {e.FullPath} {System.Environment.NewLine}";
 
 
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            var serviceLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || e.FullPath.Contains("$RECYCLE.BIN")
                                 || e.FullPath.Contains("\\Admin\\AppData\\")
@@ -541,11 +548,6 @@ namespace fileExplore
         }
 
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void listView1_MouseClick(object sender, MouseEventArgs e)
         {
 
         }
@@ -701,7 +703,17 @@ namespace fileExplore
             string path = listView1.Items[index].SubItems[3].Text;
             Process.Start(path);
         }
+        private string GetTextFromPDF(string path)
+        {
+            PdfReader reader = new PdfReader(path);
+            string text = string.Empty;
+            for (int page = 1; page <= reader.NumberOfPages; page++)
+            {
+                text += PdfTextExtractor.GetTextFromPage(reader, page);
+            }
+            reader.Close();
 
-
+            return text;
+        }
     }
 }
