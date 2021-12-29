@@ -85,5 +85,17 @@ namespace fileExplore.Dao
             }
             return false;
         }
+
+        public bool Deleted(string id)
+        {
+            var response = elasticClient.Delete<fileInfo>(id, s => s.Index("filedatasearch2"));
+
+            if (response.IsValid)
+            {
+                Debug.WriteLine("xoa thanh cong ");
+                return true;
+            }
+            return false;
+        }
     }
 }
