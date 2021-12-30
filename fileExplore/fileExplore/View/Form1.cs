@@ -106,7 +106,7 @@ namespace fileExplore
                                          | NotifyFilters.Size;
 
                         watcher.Changed += OnChanged;
-                        //watcher.Created += OnCreated;
+                        watcher.Created += OnCreated;
                         watcher.Deleted += OnDeleted;
                         watcher.Renamed += OnRenamed;
 
@@ -153,7 +153,7 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\test");
+            DirectoryInfo info = new DirectoryInfo(@"G:\ahihihi");
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
@@ -407,7 +407,7 @@ namespace fileExplore
                                     || e.FullPath.Contains("$RECYCLE.BIN")
                                     || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
                                     || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64")
-                                    || e.FullPath.Contains("\\ASUS\\ASUS");
+                                    || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
                 Debug.WriteLine(serviceLocation);
                 Debug.WriteLine(ignoreFolder);
                 if (!ignoreFolder)
@@ -419,13 +419,22 @@ namespace fileExplore
                         fileWriteTime[path].ToString() != currentLastWriteTime
                         )
                     {
-                        var name = e.Name;
-                        fileInfo fileUpload = new fileInfo();
-                        fileUpload.name = name;
-                        fileUpload.path = path;
-                        //var id = dao.GetId(e.FullPath);
-                        fileUpload.content = ReadFile(path);
-                        //dao.Update(fileUpload, id);                  
+                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                        string name = pathIncludeName[pathIncludeName.Length - 1];
+                        fileInfo f = new fileInfo();
+                        f.name = name;
+                        f.path = path;
+                        f.content = ReadFile(path);
+                        var id = dao.GetId(e.FullPath);
+                        if (id != null)
+                        {
+                           var is_success = dao.Update(f, id);
+                            if (is_success)
+                            {
+                                MessageBox.Show(" thanh cong");
+                            }
+                        }
+                              
                         fileWriteTime[path] = currentLastWriteTime;
                     }
                 }
@@ -438,36 +447,37 @@ namespace fileExplore
             
         }
 
-        /* private static void OnCreated(object sender, FileSystemEventArgs e)
-         {
-             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                 || e.FullPath.Contains("$RECYCLE.BIN")
-                                 || e.FullPath.Contains("\\elasticsearch\\")
-                                 || e.FullPath.Contains("\\kibana-elasticsearch\\")
-                                 || e.FullPath.Contains("\\ASUS\\ASUS")
-                                 || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
-             if (!ignoreFolder)
-             {
-                 var path = e.FullPath;
-                 string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                 if (!fileWriteTime.ContainsKey(path) ||
-                     fileWriteTime[path].ToString() != currentLastWriteTime
-                     )
-                 {
-                     // ghi lên elastic ở đây
-                     var name = e.Name;
-                     fileInfo fileUpload = new fileInfo();
-                     fileUpload.name = name;
-                     fileUpload.path = path;
-                     fileUpload.content = File.ReadAllText(path);
-                     dao.Add(fileUpload);
+        private static void OnCreated(object sender, FileSystemEventArgs e)
+        {
+            var serviceLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
+                                || e.FullPath.Contains("$RECYCLE.BIN")
+                                || e.FullPath.Contains("\\elasticsearch\\")
+                                || e.FullPath.Contains("\\kibana-elasticsearch\\")
+                                || e.FullPath.Contains("\\ASUS\\ASUS")
+                                || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
+            if (!ignoreFolder)
+            {
+                var path = e.FullPath;
+                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                if (!fileWriteTime.ContainsKey(path) ||
+                    fileWriteTime[path].ToString() != currentLastWriteTime
+                    )
+                {
+                    // ghi lên elastic ở đây
+                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                    string name = pathIncludeName[pathIncludeName.Length - 1];
+                    fileInfo fileUpload = new fileInfo();
+                    fileUpload.name = name;
+                    fileUpload.path = path;
+                    fileUpload.content = File.ReadAllText(path);
+                    dao.Add(fileUpload);
 
-                     fileWriteTime[path] = currentLastWriteTime;
-                 }
-             }
+                    fileWriteTime[path] = currentLastWriteTime;
+                }
+            }
 
-         }*/
+        }
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
@@ -488,7 +498,11 @@ namespace fileExplore
                     // xóa trên elastic ở đây
                     MessageBox.Show(e.FullPath + " Delete");
                     var id = dao.GetId(path);
-                    dao.Deleted(id);
+                    if(id != null)
+                    {
+                        dao.Deleted(id);
+                    }
+            
                     //---
                     fileWriteTime[path] = currentLastWriteTime;
                     fileWriteTime[path] = currentLastWriteTime;
@@ -505,7 +519,7 @@ namespace fileExplore
                                 || e.FullPath.Contains("$RECYCLE.BIN")
                                 || e.FullPath.Contains("\\Admin\\AppData\\")
                                 || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
-                                || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64");
+                                || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
             if (!ignoreFolder)
             {
                 var path = e.FullPath;
@@ -514,14 +528,18 @@ namespace fileExplore
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    var name = e.Name;
+                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                    string name = pathIncludeName[pathIncludeName.Length-1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
-                    //var id = dao.GetId(e.OldFullPath);
+                    var id = dao.GetId(e.OldFullPath);
                     fileUpload.content = ReadFile(path);
+                    if (id != null)
+                    {
+                        dao.Update(fileUpload, id);
+                    }
 
-                    //dao.Update(fileUpload, id);
                     MessageBox.Show(e.FullPath + " Rename");
 
 
@@ -606,6 +624,7 @@ namespace fileExplore
 
             Debug.WriteLine(newName);
             System.IO.File.Move(@"" + oldPath, @"" + pathNotIncludeName + newName);
+            AddItemToListView(parentDirInfo);
         }
         
         public void AddItemToListView(DirectoryInfo nodeDirInfo)
