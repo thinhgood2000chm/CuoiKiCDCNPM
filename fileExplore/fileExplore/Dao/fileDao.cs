@@ -98,7 +98,9 @@ namespace fileExplore.Dao
 
             List<fileInfo> myList = new List<fileInfo>();
             var res = elasticClient.Search<fileInfo>(
-                s => s.Index("filedatasearch2")
+                s => s
+                .Size(200)
+                .Index("filedatasearch2")
                 .Query(q => q.MultiMatch(m => m.Fields(d => d
                 .Field("name")
                 .Field("path")
