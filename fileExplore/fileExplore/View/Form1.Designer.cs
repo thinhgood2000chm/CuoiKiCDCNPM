@@ -64,6 +64,9 @@ namespace fileExplore
             // 
             // listView1
             // 
+            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
@@ -145,7 +148,7 @@ namespace fileExplore
             this.btnSearch.BackColor = System.Drawing.Color.IndianRed;
             this.btnSearch.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSearch.ForeColor = System.Drawing.Color.Bisque;
-            this.btnSearch.Location = new System.Drawing.Point(592, 22);
+            this.btnSearch.Location = new System.Drawing.Point(592, 27);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(70, 35);
             this.btnSearch.TabIndex = 8;
@@ -168,7 +171,7 @@ namespace fileExplore
             this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.label1.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Bisque;
-            this.label1.Location = new System.Drawing.Point(143, 22);
+            this.label1.Location = new System.Drawing.Point(151, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(70, 30);
             this.label1.TabIndex = 6;
@@ -178,11 +181,13 @@ namespace fileExplore
             // 
             // panel1
             // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.txtInfo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.txtFindText);
             this.panel1.Controls.Add(this.btnSearch);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(832, 102);
@@ -201,9 +206,11 @@ namespace fileExplore
             // 
             // panel3
             // 
+            this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel3.Controls.Add(this.treeViewEx);
             this.panel3.Controls.Add(this.listView1);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(0, 128);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(832, 359);
@@ -211,6 +218,8 @@ namespace fileExplore
             // 
             // treeViewEx
             // 
+            this.treeViewEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.treeViewEx.ImageIndex = 0;
             this.treeViewEx.ImageList = this.imageList1;
             this.treeViewEx.Location = new System.Drawing.Point(3, 15);
