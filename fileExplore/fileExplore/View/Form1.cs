@@ -55,7 +55,7 @@ namespace fileExplore
             else // choox này sẽ xoắ đi khi hoàn tất #################################################
             {
                 txtInfo.Visible = false;
-                MessageBox.Show(" data da ton taij");
+                MessageBox.Show(" data ton tai");
                 //btnSearch.Enabled = true;
             }
 
@@ -153,48 +153,52 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\ahihihi");
-            if (IsHandleCreated)
-            {
-                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
-            }
-          
-            if (info.Exists)
-            {
-                Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                task.Start();
-                GetFileInFolder(info);
-                task.Wait();
-            }
+            /*  DirectoryInfo info = new DirectoryInfo(@"G:\ahihihi");
+              if (IsHandleCreated)
+              {
+                  btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+              }
+
+              if (info.Exists)
+              {
+                  Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                  task.Start();
+                  GetFileInFolder(info);
+                  task.Wait();
+              }*/
 
 
 
             // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
-            /*  var ListDriverInfor = DriveInfo.GetDrives();
-              btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; }));
-              for (int i = 0; i < ListDriverInfor.Length; i++)
-              {
-                  DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
-                  //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
-                  //progressBar.UpdateProgress(i, info.GetDirectories().Length);
+            var ListDriverInfor = DriveInfo.GetDrives();
+            if (IsHandleCreated)
+            {
+                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+            }
+            for (int i = 0; i < ListDriverInfor.Length; i++)
+            {
+                DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
+                //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
+                //progressBar.UpdateProgress(i, info.GetDirectories().Length);
 
-                  if (info.Exists)
-                  {
+                if (info.Exists)
+                {
 
-                      Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                      task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
+                    Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                    task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
 
-                      GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
-                      task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
+                    GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
+                    task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
 
-                  }
+                }
 
 
-              }*/
+            }
             /* if (progressBar.InvokeRequired)
                  progressBar.BeginInvoke(new Action(() => progressBar.Close()));
 
              isProcessRunning = false;*/
+
             if (IsHandleCreated)
             {
                 txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
@@ -376,7 +380,7 @@ namespace fileExplore
                 // gắn file vào folder con vào list vỉew
                 AddItemToListView(nodeDirInfo);
 
-                //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
             catch(UnauthorizedAccessException)
             {
@@ -470,7 +474,7 @@ namespace fileExplore
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
-                    fileUpload.content = File.ReadAllText(path);
+                    fileUpload.content = ReadFile(path);
                     dao.Add(fileUpload);
 
                     fileWriteTime[path] = currentLastWriteTime;
@@ -557,7 +561,26 @@ namespace fileExplore
         // Viết chức năng tìm kiếm
         private void btnSearch_Click(object sender, EventArgs e)
         {
+            listView1.Items.Clear();
+            string text = txtFindText.Text;
 
+            ListViewItem item = null;
+            ListViewItem.ListViewSubItem[] subItems;
+
+            var searchDatas = dao.Search(text);
+            foreach (var data in searchDatas)
+            {
+                Debug.WriteLine("data"+data.name);
+
+                item = new ListViewItem(data.name, 1);
+                subItems = new ListViewItem.ListViewSubItem[]
+                    {new ListViewItem.ListViewSubItem(item, "File"),
+                        new ListViewItem.ListViewSubItem(item,
+                           ""),
+                        new ListViewItem.ListViewSubItem(item,data.path)};
+                item.SubItems.AddRange(subItems);
+                listView1.Items.Add(item);
+            }
         }
 
         private void txtPath_TextChanged(object sender, EventArgs e)
@@ -719,8 +742,15 @@ namespace fileExplore
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
             int index = listView1.SelectedItems[0].Index;
+            string type = listView1.Items[index].SubItems[1].Text;
             string path = listView1.Items[index].SubItems[3].Text;
-            Process.Start(path);
+ 
+            if (type == "File")
+            {
+                Process.Start(path);
+            }
+  
+
         }
         private string GetTextFromPDF(string path)
         {
@@ -734,5 +764,7 @@ namespace fileExplore
 
             return text;
         }
+
+
     }
 }
