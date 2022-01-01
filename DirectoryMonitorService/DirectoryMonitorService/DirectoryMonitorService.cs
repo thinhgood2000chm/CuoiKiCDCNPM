@@ -10,12 +10,15 @@ using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DirectoryMonitorService.DAO;
+using Nest;
 
 namespace DirectoryMonitorService
 {
     public partial class DirectoryMonitorService : ServiceBase
     {
         //---- Install window service ----------------------------------------------------------|
+        // Start project to create debug folder                                                 |
         // run as administrator: Developer Command Prompt for VS 2019                           |
         // cd to folder debug:   ...\DirectoryMonitorService\DirectoryMonitorService\bin\Debug  |
         // install service:      installutil.exe -i DirectoryMonitorService.exe                 |
@@ -33,6 +36,8 @@ namespace DirectoryMonitorService
         static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "\\iTProgram\\", "C:\\Users" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
+        // file dao
+        static fileDao dao = new fileDao();
 
         public DirectoryMonitorService()
         {
@@ -89,11 +94,8 @@ namespace DirectoryMonitorService
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
-            // write to file
-            var msg = $"{e.ChangeType} --- {e.FullPath} {System.Environment.NewLine}";
             // get service location
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            // ignore monitor diretory write log AND recycle bin
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
@@ -105,8 +107,20 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    //-- write log
-                    File.AppendAllText($"{serviceLocation}\\log.txt", msg);
+                    // Change on elastic
+                    string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                    string name = pathIncludeName[pathIncludeName.Length - 1];
+                    
+                    fileInfo f = new fileInfo();
+                    f.name = name;
+                    f.path = path;
+                    f.content = ReadFile(path);
+                    var id = dao.GetId(e.FullPath);
+                    if (id != null)
+                    {
+                        dao.Update(f, id);
+                    }
+                    // End Change
 
                     fileWriteTime[path] = currentLastWriteTime;
                 }
@@ -115,11 +129,7 @@ namespace DirectoryMonitorService
 
         private static void OnCreated(object sender, FileSystemEventArgs e)
         {
-            var msg = $"Created --- {e.FullPath} {System.Environment.NewLine}";
-
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || pathIgnore.Any(e.FullPath.Contains);
+            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
@@ -128,17 +138,26 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    File.AppendAllText($"{serviceLocation}\\log.txt", msg);
+                    // Create on elastic
+                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                    string name = pathIncludeName[pathIncludeName.Length - 1];
+
+                    fileInfo fileUpload = new fileInfo();
+                    fileUpload.name = name;
+                    fileUpload.path = path;
+                    fileUpload.content = ReadFile(path);
+
+                    dao.Add(fileUpload);
+                    // End Create
+
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
         }
 
+
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            var msg = $"Deleted --- {e.FullPath} {System.Environment.NewLine}";
-
-
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || pathIgnore.Any(e.FullPath.Contains);
@@ -150,7 +169,14 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    File.AppendAllText($"{serviceLocation}\\log.txt", msg);
+                    // Delete on elastic
+                    var id = dao.GetId(path);
+                    if (id != null)
+                    {
+                        dao.Deleted(id);
+                    }
+                    // End Delete
+
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
@@ -158,9 +184,6 @@ namespace DirectoryMonitorService
 
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
-            var msg = $"Renamed --- Old: {e.OldFullPath} New: {e.FullPath} {System.Environment.NewLine}";
-
-
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || pathIgnore.Any(e.FullPath.Contains);
@@ -172,11 +195,54 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    File.AppendAllText($"{serviceLocation}\\log.txt", msg);
+                    // Rename on elastic
+                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                    string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
+                    
+                    fileInfo fileUpload = new fileInfo();
+                    fileUpload.name = name;
+                    fileUpload.path = path;
+                    var id = dao.GetId(e.OldFullPath);
+                    fileUpload.content = ReadFile(path);
+
+                    if (id != null)
+                    {
+                        dao.Update(fileUpload, id);
+                    }
+                    // End Rename
+
                     fileWriteTime[path] = currentLastWriteTime;
                 }
             }
         }
         // END file system watcher
+
+        // Support function
+        public static string ReadFile(string path)
+        {
+            string content;
+            try
+            {
+                if (!path.Contains(".tmp"))
+                {// bỏ qua file tmp khi word đang được thay đổi
+                    content = File.ReadAllText(path);
+                    return content;
+                }
+
+            }
+            catch (FileNotFoundException)
+            {
+
+            }
+            catch (UnauthorizedAccessException)
+            {
+
+            }
+            catch (IOException)
+            {
+
+            }
+            return "";
+        }
     }
 }

@@ -3,7 +3,7 @@ using Nest;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace fileExplore.Dao
+namespace DirectoryMonitorService.DAO
 {
     class fileDao
     {

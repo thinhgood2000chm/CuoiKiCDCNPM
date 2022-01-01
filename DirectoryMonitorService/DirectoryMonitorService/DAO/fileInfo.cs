@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fileExplore.Dao
+namespace DirectoryMonitorService.DAO
 {
     class fileInfo
     {
