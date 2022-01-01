@@ -30,7 +30,7 @@ namespace DirectoryMonitorService
 
         FileSystemWatcher[] fileSystemWatchers;
         // folders you don't want to apply file system watcher
-        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "\\ProgramData\\" , "\\iTProgram\\" };
+        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "\\iTProgram\\", "C:\\Users" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
 
