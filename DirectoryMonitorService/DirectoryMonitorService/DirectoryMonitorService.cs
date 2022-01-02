@@ -9,6 +9,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using DirectoryMonitorService.DAO;
 using Nest;
@@ -95,37 +96,38 @@ namespace DirectoryMonitorService
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
             // get service location
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || pathIgnore.Any(e.FullPath.Contains);
+            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 // fix duplicate change event
                 string path = e.FullPath.ToString();
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
+                if (!path.Contains("elastic"))
                 {
-                    //-- Change on elastic
-                    string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                    string name = pathIncludeName[pathIncludeName.Length - 1];
-
-                    // read file
-                    fileInfo f = new fileInfo();
-                    f.name = name;
-                    f.path = path;
-                    f.content = ReadFile(path);
-
-                    // update elastic
-                    var id = dao.GetId(e.FullPath);
-                    if (id != null)
+                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                    if (!fileWriteTime.ContainsKey(path) ||
+                        fileWriteTime[path].ToString() != currentLastWriteTime
+                        )
                     {
-                        dao.Update(f, id);
-                    }
-                    // End Change
+                        //-- Change on elastic
+                        string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                        string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                    fileWriteTime[path] = currentLastWriteTime;
+                        // read file
+                        fileInfo f = new fileInfo();
+                        f.name = name;
+                        f.path = path;
+                        f.content = ReadFile(path);
+
+                        // update elastic
+                        var id = dao.GetId(e.FullPath);
+                        if (id != null)
+                        {
+                            dao.Update(f, id);
+                        }
+                        // End Change
+
+                        fileWriteTime[path] = currentLastWriteTime;
+                    }
                 }
             }
         }
@@ -136,24 +138,27 @@ namespace DirectoryMonitorService
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
+                if (!path.Contains("elastic"))
                 {
-                    //-- Create on elastic
-                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                    string name = pathIncludeName[pathIncludeName.Length - 1];
+                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                    if (!fileWriteTime.ContainsKey(path) ||
+                        fileWriteTime[path].ToString() != currentLastWriteTime
+                        )
+                    {
+                        //-- Create on elastic
+                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                        string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                    fileInfo fileUpload = new fileInfo();
-                    fileUpload.name = name;
-                    fileUpload.path = path;
-                    fileUpload.content = ReadFile(path);
+                        fileInfo fileUpload = new fileInfo();
+                        fileUpload.name = name;
+                        fileUpload.path = path;
+                        fileUpload.content = ReadFile(path);
 
-                    dao.Add(fileUpload);
-                    // End Create
+                        dao.Add(fileUpload);
+                        // End Create
 
-                    fileWriteTime[path] = currentLastWriteTime;
+                        fileWriteTime[path] = currentLastWriteTime;
+                    }
                 }
             }
         }
@@ -161,60 +166,62 @@ namespace DirectoryMonitorService
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || pathIgnore.Any(e.FullPath.Contains);
+            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
+                if (!path.Contains("elastic"))
                 {
-                    //-- Delete on elastic
-                    var id = dao.GetId(path);
-                    if (id != null)
+                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                    if (!fileWriteTime.ContainsKey(path) ||
+                        fileWriteTime[path].ToString() != currentLastWriteTime
+                        )
                     {
-                        dao.Deleted(id);
-                    }
-                    // End Delete
+                        //-- Delete on elastic
+                        var id = dao.GetId(path);
+                        if (id != null)
+                        {
+                            dao.Deleted(id);
+                        }
+                        // End Delete
 
-                    fileWriteTime[path] = currentLastWriteTime;
+                        fileWriteTime[path] = currentLastWriteTime;
+                    }
                 }
             }
         }
 
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
-            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            bool ignoreFolder = e.FullPath.Contains(serviceLocation)
-                                || pathIgnore.Any(e.FullPath.Contains);
+            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
             if (!ignoreFolder)
             {
                 string path = e.FullPath.ToString();
-                string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                if (!fileWriteTime.ContainsKey(path) ||
-                    fileWriteTime[path].ToString() != currentLastWriteTime
-                    )
+                if (!path.Contains("elastic"))
                 {
-                    //-- Rename on elastic
-                    string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                    string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
-                    
-                    fileInfo fileUpload = new fileInfo();
-                    fileUpload.name = name;
-                    fileUpload.path = path;
-                    var id = dao.GetId(e.OldFullPath);
-                    fileUpload.content = ReadFile(path);
-
-                    if (id != null)
+                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                    if (!fileWriteTime.ContainsKey(path) ||
+                        fileWriteTime[path].ToString() != currentLastWriteTime
+                        )
                     {
-                        dao.Update(fileUpload, id);
-                    }
-                    // End Rename
+                        //-- Rename on elastic
+                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                        string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
 
-                    fileWriteTime[path] = currentLastWriteTime;
+                        fileInfo fileUpload = new fileInfo();
+                        fileUpload.name = name;
+                        fileUpload.path = path;
+                        var id = dao.GetId(e.OldFullPath);
+                        fileUpload.content = ReadFile(path);
+
+                        if (id != null)
+                        {
+                            dao.Update(fileUpload, id);
+                        }
+                        // End Rename
+
+                        fileWriteTime[path] = currentLastWriteTime;
+                    }
                 }
             }
         }
@@ -223,15 +230,21 @@ namespace DirectoryMonitorService
         // Support function
         public static string ReadFile(string path)
         {
-            string content;
+            string content = "";
             try
             {
                 if (!path.Contains(".tmp"))
                 {// bỏ qua file tmp khi word đang được thay đổi
-                    content = File.ReadAllText(path);
-                    
+                    Thread thread = new Thread(() =>
+                    {
+                        content = File.ReadAllText(path);
+                    });
+                    thread.Start();
+                    thread.Join();
+                    //content = 
                     return content;
                 }
+
             }
             catch (FileNotFoundException)
             {
