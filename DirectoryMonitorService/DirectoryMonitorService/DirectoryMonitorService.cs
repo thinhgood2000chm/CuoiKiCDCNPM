@@ -241,10 +241,10 @@ namespace DirectoryMonitorService
             {
                 File.AppendAllText($"C:\\log.txt", "\nUnauthorizedAccessException\n" + path);
             }
-            /*catch (IOException)
+            catch (IOException)
             {
                 File.AppendAllText($"C:\\log.txt", "\nIOException\n" + path);
-            }*/
+            }
             return "";
         }
     }
