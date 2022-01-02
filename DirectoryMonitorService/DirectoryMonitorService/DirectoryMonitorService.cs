@@ -107,14 +107,17 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // Change on elastic
+                    //-- Change on elastic
                     string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                     string name = pathIncludeName[pathIncludeName.Length - 1];
-                    
+
+                    // read file
                     fileInfo f = new fileInfo();
                     f.name = name;
                     f.path = path;
                     f.content = ReadFile(path);
+
+                    // update elastic
                     var id = dao.GetId(e.FullPath);
                     if (id != null)
                     {
@@ -138,7 +141,7 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // Create on elastic
+                    //-- Create on elastic
                     string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                     string name = pathIncludeName[pathIncludeName.Length - 1];
 
@@ -169,7 +172,7 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // Delete on elastic
+                    //-- Delete on elastic
                     var id = dao.GetId(path);
                     if (id != null)
                     {
@@ -195,7 +198,7 @@ namespace DirectoryMonitorService
                     fileWriteTime[path].ToString() != currentLastWriteTime
                     )
                 {
-                    // Rename on elastic
+                    //-- Rename on elastic
                     string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                     string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
                     
@@ -226,22 +229,22 @@ namespace DirectoryMonitorService
                 if (!path.Contains(".tmp"))
                 {// bỏ qua file tmp khi word đang được thay đổi
                     content = File.ReadAllText(path);
+                    
                     return content;
                 }
-
             }
             catch (FileNotFoundException)
             {
-
+                File.AppendAllText($"C:\\log.txt", "\nFileNotFoundException\n" + path);
             }
             catch (UnauthorizedAccessException)
             {
-
+                File.AppendAllText($"C:\\log.txt", "\nUnauthorizedAccessException\n" + path);
             }
-            catch (IOException)
+            /*catch (IOException)
             {
-
-            }
+                File.AppendAllText($"C:\\log.txt", "\nIOException\n" + path);
+            }*/
             return "";
         }
     }
