@@ -117,6 +117,10 @@ namespace DirectoryMonitorService
                         f.name = name;
                         f.path = path;
                         f.content = ReadFile(path);
+                        /*if(path.Contains(".pdf"))
+							fileUpload.content = GetTextFromPDF(path);
+						else
+							fileUpload.content = ReadFile(path);*/
 
                         // update elastic
                         var id = dao.GetId(e.FullPath);
@@ -153,6 +157,10 @@ namespace DirectoryMonitorService
                         fileUpload.name = name;
                         fileUpload.path = path;
                         fileUpload.content = ReadFile(path);
+                        /*if(path.Contains(".pdf"))
+							fileUpload.content = GetTextFromPDF(path);
+						else
+							fileUpload.content = ReadFile(path);*/
 
                         dao.Add(fileUpload);
                         // End Create
@@ -254,9 +262,9 @@ namespace DirectoryMonitorService
             {
                 File.AppendAllText($"C:\\log.txt", "\nUnauthorizedAccessException\n" + path);
             }
-            catch (IOException)
+            catch (IOException e)
             {
-                File.AppendAllText($"C:\\log.txt", "\nIOException\n" + path);
+                File.AppendAllText($"C:\\log.txt", "\nIOException " + e + "\n" + path);
             }
             return "";
         }
