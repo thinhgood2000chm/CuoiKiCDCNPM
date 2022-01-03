@@ -9,10 +9,10 @@ namespace fileExplore.Dao
     {
         static ConnectionSettings connectionSettings = new ConnectionSettings(new Uri("http://localhost:9200/")); //local PC      
         ElasticClient elasticClient = new ElasticClient(connectionSettings);
-        public bool AddList(List<fileInfo> fileInfos)
+        public bool AddList(List<fileInfo> fileInfos, string index)
         {
             var bulkIndexResponse = elasticClient.Bulk(b => b
-               .Index("filedatasearch2")
+               .Index(index)
                .IndexMany(fileInfos)
              );
 
@@ -23,7 +23,7 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public bool Add(fileInfo file)
+        public bool Add(fileInfo file, string index)
         {
             var myJson = new
             {
@@ -31,7 +31,7 @@ namespace fileExplore.Dao
                 path = file.path,
                 content = file.content
             };
-            var response = elasticClient.Index(myJson, i => i.Index("filedatasearch2"));
+            var response = elasticClient.Index(myJson, i => i.Index(index));
             if (response.IsValid)
             {
                 return true;
@@ -39,9 +39,9 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public bool CheckExits(string dataCheck)
+        public bool CheckExits(string dataCheck, string index)
         {
-            var response = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            var response = elasticClient.Search<fileInfo>(s => s.Index(index)
              .Query(q => q.Match(m => m.Field("name").Query(dataCheck))));
             if (response.Hits.Count > 0)
             {
@@ -50,9 +50,9 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public string GetId(string oldPath)
+        public string GetId(string oldPath, string index)
         {
-            var res = elasticClient.Search<fileInfo>(s => s.Index("filedatasearch2")
+            var res = elasticClient.Search<fileInfo>(s => s.Index(index)
             .Query(q=>q.Term(p=>p.path.Suffix("keyword"),oldPath)));
 
 
@@ -69,10 +69,10 @@ namespace fileExplore.Dao
           
 
         }
-        public bool Update(fileInfo file, string id)
+        public bool Update(fileInfo file, string id, string index)
         {
            var res = elasticClient.Update<fileInfo>(id,
-                d => d.Index("filedatasearch2")
+                d => d.Index(index)
                 .Doc(file));
             if (res.IsValid)
             {
@@ -81,9 +81,9 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public bool Deleted(string id)
+        public bool Deleted(string id, string index)
         {
-            var response = elasticClient.Delete<fileInfo>(id, s => s.Index("filedatasearch2"));
+            var response = elasticClient.Delete<fileInfo>(id, s => s.Index(index));
 
             if (response.IsValid)
             {
@@ -93,14 +93,14 @@ namespace fileExplore.Dao
             return false;
         }
 
-        public List<fileInfo> Search(string text)
+        public List<fileInfo> Search(string text, string index)
         {
 
             List<fileInfo> myList = new List<fileInfo>();
             var res = elasticClient.Search<fileInfo>(
                 s => s
                 .Size(200)
-                .Index("filedatasearch2")
+                .Index(index)
                 .Query(q => q.MultiMatch(m => m.Fields(d => d
                 .Field("name")
                 .Field("path")

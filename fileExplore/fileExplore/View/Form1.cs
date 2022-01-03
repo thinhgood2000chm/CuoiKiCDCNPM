@@ -11,6 +11,7 @@ using Microsoft.VisualBasic;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace fileExplore
 {
@@ -18,7 +19,7 @@ namespace fileExplore
     {
         // constant
         string dataCheck = "dataforCheck11231asasdasdqweadaw";
-
+        static string index = "";
         List<fileInfo> ListJson = new List<fileInfo>();
 
         // FileSystemWatcher
@@ -36,8 +37,22 @@ namespace fileExplore
         public Form1()
         {
             InitializeComponent();
+            // lấy ra uuid của từng máy nếu ko có sẽ tạo sau đó sử dụng uuid này để làm index 
+            //==> mỗi máy khác nhau sẽ có uuid khác nhau và sẽ được lưu vào 1 index riêng 
+            //==> tránh trường hợp nhiều máy dùng chung 1 server nhưng đều truy suất vào 1 index 
+            try
+            {
+                index = File.ReadAllText("key.txt");
+                Debug.WriteLine("##############" + index);
+            }
+            catch
+            {
+                Guid g = Guid.NewGuid();
+                File.WriteAllText("key.txt", g.ToString());
+            }
+
             PopulateTreeView();
-            bool checkExitsData = dao.CheckExits(dataCheck);
+            bool checkExitsData = dao.CheckExits(dataCheck, index);
             if (!checkExitsData)
             {
                 ListJson.Add(new fileInfo()
@@ -153,47 +168,47 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            /*  DirectoryInfo info = new DirectoryInfo(@"G:\ahihihi");
-              if (IsHandleCreated)
-              {
-                  btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
-              }
-
-              if (info.Exists)
-              {
-                  Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                  task.Start();
-                  GetFileInFolder(info);
-                  task.Wait();
-              }*/
-
-
-
-            // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
-            var ListDriverInfor = DriveInfo.GetDrives();
+            DirectoryInfo info = new DirectoryInfo(@"G:\test\");
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
             }
-            for (int i = 0; i < ListDriverInfor.Length; i++)
+
+            if (info.Exists)
             {
-                DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
-                //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
-                //progressBar.UpdateProgress(i, info.GetDirectories().Length);
-
-                if (info.Exists)
-                {
-
-                    Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                    task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
-
-                    GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
-                    task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
-
-                }
-
-
+                Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                task.Start();
+                GetFileInFolder(info);
+                task.Wait();
             }
+
+
+
+            // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
+            /*     var ListDriverInfor = DriveInfo.GetDrives();
+                 if (IsHandleCreated)
+                 {
+                     btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+                 }
+                 for (int i = 0; i < ListDriverInfor.Length; i++)
+                 {
+                     DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
+                     //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
+                     //progressBar.UpdateProgress(i, info.GetDirectories().Length);
+
+                     if (info.Exists)
+                     {
+
+                         Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                         task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
+
+                         GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
+                         task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
+
+                     }
+
+
+                 }*/
             /* if (progressBar.InvokeRequired)
                  progressBar.BeginInvoke(new Action(() => progressBar.Close()));
 
@@ -206,7 +221,7 @@ namespace fileExplore
             }
 
 
-            var bulkIndexResponse = dao.AddList(ListJson);
+            var bulkIndexResponse = dao.AddList(ListJson, index);
             if (bulkIndexResponse)
             {
                 txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
@@ -257,7 +272,7 @@ namespace fileExplore
             // cứ khoảng 100 data thì gửi lên elasstic và xóa data trong list ( tránh tràn bộ nhớ nếu gửi lên 1 lần) 
             if (ListJson.Count > 100)
             {
-                var bulkIndexResponse = dao.AddList(ListJson);
+                var bulkIndexResponse = dao.AddList(ListJson, index);
                 ListJson.Clear();
             }
             try
@@ -273,6 +288,10 @@ namespace fileExplore
                         {
                             Debug.WriteLine("da vao");
                             content = GetTextFromPDF(file.FullName);
+                        }
+                        else if(file.Extension == ".docx")
+                        {
+                            content = GetTextFromDocx(file.FullName);
                         }
                         else
                         {
@@ -429,10 +448,10 @@ namespace fileExplore
                         f.name = name;
                         f.path = path;
                         f.content = ReadFile(path);
-                        var id = dao.GetId(e.FullPath);
+                        var id = dao.GetId(e.FullPath, index);
                         if (id != null)
                         {
-                           var is_success = dao.Update(f, id);
+                           var is_success = dao.Update(f, id, index);
                             if (is_success)
                             {
                                 MessageBox.Show(" thanh cong");
@@ -475,7 +494,7 @@ namespace fileExplore
                     fileUpload.name = name;
                     fileUpload.path = path;
                     fileUpload.content = ReadFile(path);
-                    dao.Add(fileUpload);
+                    dao.Add(fileUpload, index);
 
                     fileWriteTime[path] = currentLastWriteTime;
                 }
@@ -501,10 +520,10 @@ namespace fileExplore
                 {
                     // xóa trên elastic ở đây
                     MessageBox.Show(e.FullPath + " Delete");
-                    var id = dao.GetId(path);
+                    var id = dao.GetId(path, index);
                     if(id != null)
                     {
-                        dao.Deleted(id);
+                        dao.Deleted(id, index);
                     }
             
                     //---
@@ -537,11 +556,11 @@ namespace fileExplore
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
-                    var id = dao.GetId(e.OldFullPath);
+                    var id = dao.GetId(e.OldFullPath, index);
                     fileUpload.content = ReadFile(path);
                     if (id != null)
                     {
-                        dao.Update(fileUpload, id);
+                        dao.Update(fileUpload, id, index);
                     }
 
                     MessageBox.Show(e.FullPath + " Rename");
@@ -567,7 +586,7 @@ namespace fileExplore
             ListViewItem item = null;
             ListViewItem.ListViewSubItem[] subItems;
 
-            var searchDatas = dao.Search(text);
+            var searchDatas = dao.Search(text, index);
             foreach (var data in searchDatas)
             {
                 Debug.WriteLine("data"+data.name);
@@ -763,6 +782,34 @@ namespace fileExplore
             reader.Close();
 
             return text;
+        }
+
+        private string GetTextFromDocx(object path)
+        {
+            Microsoft.Office.Interop.Word.Application word = new Microsoft.Office.Interop.Word.Application();
+            object miss = System.Reflection.Missing.Value;
+            object readOnly = true;
+            Microsoft.Office.Interop.Word.Document docs = word.Documents.Open(ref path, ref miss, ref readOnly, ref miss, ref miss,
+                        ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss);
+
+            string totaltext = "";      //the whole document
+            try
+            {
+                for (int i = 0; i < docs.Paragraphs.Count; i++)
+                {
+                    totaltext += docs.Paragraphs[i + 1].Range.Text.ToString();
+                }
+
+            }
+            catch (COMException)
+            {
+
+            }
+
+            docs.Close();
+            word.Quit();
+
+            return totaltext;
         }
 
 
