@@ -41,9 +41,10 @@ namespace fileExplore.Dao
 
         public bool CheckExits(string dataCheck, string index)
         {
-            var response = elasticClient.Search<fileInfo>(s => s.Index(index)
-             .Query(q => q.Match(m => m.Field("name").Query(dataCheck))));
-            if (response.Hits.Count > 0)
+            var res = elasticClient.Search<fileInfo>(s => s.Index(index)
+           .Query(q => q.Term(p => p.name.Suffix("keyword"), dataCheck)));
+
+            if (res.Hits.Count > 0)
             {
                 return true;
             }

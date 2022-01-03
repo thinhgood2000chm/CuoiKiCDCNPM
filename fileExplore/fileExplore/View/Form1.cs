@@ -15,6 +15,9 @@ using System.Runtime.InteropServices;
 
 namespace fileExplore
 {
+
+    // công việc cần làm ngày mai : đổi qua bên chạy ngầm check, trong mỗi chạy ngầm check bỏ file elastic, thêm lấy index , kiểm tra xem đã try catch đọc file pdf và word chưa
+   // sửa nội dung file txt trong chạy ngầm ( đạt ) 
     public partial class Form1 : Form
     {
         // constant
@@ -40,19 +43,42 @@ namespace fileExplore
             // lấy ra uuid của từng máy nếu ko có sẽ tạo sau đó sử dụng uuid này để làm index 
             //==> mỗi máy khác nhau sẽ có uuid khác nhau và sẽ được lưu vào 1 index riêng 
             //==> tránh trường hợp nhiều máy dùng chung 1 server nhưng đều truy suất vào 1 index 
+           string systempath = Environment.GetEnvironmentVariable("SystemRoot");
+
+            string[] pathIncludeName = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+            string name = pathIncludeName[0];
+            bool checkExitsData = false;
+
             try
             {
-                index = File.ReadAllText("key.txt");
+                // Application.persistentDataPath + "/player.data"
+                index = File.ReadAllText($"{name}\\data_key\\key.txt");
                 Debug.WriteLine("##############" + index);
+                checkExitsData = dao.CheckExits(dataCheck, index);
             }
             catch
             {
                 Guid g = Guid.NewGuid();
-                File.WriteAllText("key.txt", g.ToString());
+                index = g.ToString();
+                string newFolderPath = $"{name}\\data_key";
+                bool exists = System.IO.Directory.Exists(newFolderPath);
+                if (!exists)
+                {
+                    var folder = Directory.CreateDirectory(newFolderPath);
+                    if (folder.Exists)
+                    {
+                        File.WriteAllText($"{name}\\data_key\\key.txt", g.ToString());
+                    }
+                }
+                else
+                {
+                    File.WriteAllText($"{name}\\data_key\\key.txt", g.ToString());
+                }
+
             }
 
             PopulateTreeView();
-            bool checkExitsData = dao.CheckExits(dataCheck, index);
+          
             if (!checkExitsData)
             {
                 ListJson.Add(new fileInfo()
@@ -120,10 +146,10 @@ namespace fileExplore
                                          | NotifyFilters.Security
                                          | NotifyFilters.Size;
 
-                        watcher.Changed += OnChanged;
+        /*                watcher.Changed += OnChanged;
                         watcher.Created += OnCreated;
                         watcher.Deleted += OnDeleted;
-                        watcher.Renamed += OnRenamed;
+                        watcher.Renamed += OnRenamed;*/
 
                         fileSystemWatchers[i] = watcher;
                         i++;
@@ -429,37 +455,49 @@ namespace fileExplore
                 bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                     || e.FullPath.Contains("$RECYCLE.BIN")
                                     || e.FullPath.Contains("D:\\Server\\elasticsearch-7.16.0-windows-x86_64")
-                                    || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64")
-                                    || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
+                                    || e.FullPath.Contains("D:\\Server\\kibana-7.16.0-windows-x86_64");
+                                    //|| e.FullPath.Contains("G:\\elasticsearch-7.15.1");
                 Debug.WriteLine(serviceLocation);
                 Debug.WriteLine(ignoreFolder);
                 if (!ignoreFolder)
                 {
                     // sữa lỗi ghi 2 lần một thông tin
                     var path = e.FullPath;
-                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                    if (!fileWriteTime.ContainsKey(path) ||
-                        fileWriteTime[path].ToString() != currentLastWriteTime
-                        )
+                    if (!path.Contains("elasticsearch")) // thay vì dùng ignoreFolder thì dùng cách này để loại bỏ các path của folder elasticsearch 
                     {
-                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                        string name = pathIncludeName[pathIncludeName.Length - 1];
-                        fileInfo f = new fileInfo();
-                        f.name = name;
-                        f.path = path;
-                        f.content = ReadFile(path);
-                        var id = dao.GetId(e.FullPath, index);
-                        if (id != null)
+                        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                        if (!fileWriteTime.ContainsKey(path) ||
+                            fileWriteTime[path].ToString() != currentLastWriteTime
+                            )
                         {
-                           var is_success = dao.Update(f, id, index);
-                            if (is_success)
+                            string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string name = pathIncludeName[pathIncludeName.Length - 1];
+                            fileInfo f = new fileInfo();
+                            f.name = name;
+                            f.path = path;
+                            if (path.Contains("docx"))
                             {
-                                MessageBox.Show(" thanh cong");
+                                f.content = GetTextFromDocx(path);
                             }
+                            else
+                            {
+                                f.content = ReadFile(path);
+                            }
+
+                            var id = dao.GetId(e.FullPath, index);
+                            if (id != null)
+                            {
+                                var is_success = dao.Update(f, id, index);
+                                if (is_success)
+                                {
+                                    MessageBox.Show(" thanh cong");
+                                }
+                            }
+
+                            fileWriteTime[path] = currentLastWriteTime;
                         }
-                              
-                        fileWriteTime[path] = currentLastWriteTime;
                     }
+                 
                 }
             }
             catch (FileNotFoundException)
@@ -493,7 +531,15 @@ namespace fileExplore
                     fileInfo fileUpload = new fileInfo();
                     fileUpload.name = name;
                     fileUpload.path = path;
-                    fileUpload.content = ReadFile(path);
+                    if (path.Contains("docx"))
+                    {
+                        fileUpload.content = GetTextFromDocx(path);
+                    }
+                    else
+                    {
+                        fileUpload.content = ReadFile(path);
+                    }
+    
                     dao.Add(fileUpload, index);
 
                     fileWriteTime[path] = currentLastWriteTime;
@@ -504,6 +550,7 @@ namespace fileExplore
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
+            
             var serviceLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             bool ignoreFolder = e.FullPath.Contains(serviceLocation)
                                 || e.FullPath.Contains("$RECYCLE.BIN")
@@ -512,6 +559,7 @@ namespace fileExplore
                                 || e.FullPath.Contains("G:\\elasticsearch-7.15.1");
             if (!ignoreFolder)
             {
+                MessageBox.Show("vao xóa");
                 var path = e.FullPath;
                 string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
                 if (!fileWriteTime.ContainsKey(path) ||
@@ -557,7 +605,15 @@ namespace fileExplore
                     fileUpload.name = name;
                     fileUpload.path = path;
                     var id = dao.GetId(e.OldFullPath, index);
-                    fileUpload.content = ReadFile(path);
+                    if (path.Contains("docx"))
+                    {
+                        fileUpload.content = GetTextFromDocx(path);
+                    }
+                    else
+                    {
+                        fileUpload.content = ReadFile(path);
+                    }
+
                     if (id != null)
                     {
                         dao.Update(fileUpload, id, index);
@@ -773,43 +829,59 @@ namespace fileExplore
         }
         private string GetTextFromPDF(string path)
         {
-            PdfReader reader = new PdfReader(path);
-            string text = string.Empty;
-            for (int page = 1; page <= reader.NumberOfPages; page++)
-            {
-                text += PdfTextExtractor.GetTextFromPage(reader, page);
-            }
-            reader.Close();
-
-            return text;
-        }
-
-        private string GetTextFromDocx(object path)
-        {
-            Microsoft.Office.Interop.Word.Application word = new Microsoft.Office.Interop.Word.Application();
-            object miss = System.Reflection.Missing.Value;
-            object readOnly = true;
-            Microsoft.Office.Interop.Word.Document docs = word.Documents.Open(ref path, ref miss, ref readOnly, ref miss, ref miss,
-                        ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss);
-
-            string totaltext = "";      //the whole document
             try
             {
+                PdfReader reader = new PdfReader(path);
+                string text = string.Empty;
+                for (int page = 1; page <= reader.NumberOfPages; page++)
+                {
+                    text += PdfTextExtractor.GetTextFromPage(reader, page);
+                }
+                reader.Close();
+
+                return text;
+            }
+            catch (IOException)
+            {
+
+            }
+            return "";
+      
+        }
+
+        private static string GetTextFromDocx(object path)
+        {
+
+                 //the whole document
+            try
+            {
+                string totaltext = "";
+                Microsoft.Office.Interop.Word.Application word = new Microsoft.Office.Interop.Word.Application();
+                object miss = System.Reflection.Missing.Value;
+                object readOnly = true;
+                Microsoft.Office.Interop.Word.Document docs = word.Documents.Open(ref path, ref miss, ref readOnly, ref miss, ref miss,
+                            ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss);
                 for (int i = 0; i < docs.Paragraphs.Count; i++)
                 {
                     totaltext += docs.Paragraphs[i + 1].Range.Text.ToString();
                 }
+                docs.Close();
+                word.Quit();
+                return totaltext;
 
             }
             catch (COMException)
             {
 
             }
+            catch (IOException)
+            {
 
-            docs.Close();
-            word.Quit();
+            }
 
-            return totaltext;
+
+            return "";
+       
         }
 
 
