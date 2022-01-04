@@ -15,6 +15,7 @@ using DirectoryMonitorService.DAO;
 using Nest;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
+using Path = System.IO.Path;
 
 namespace DirectoryMonitorService
 {
@@ -129,16 +130,7 @@ namespace DirectoryMonitorService
                             f.name = name;
                             f.path = path;
                             if (path.Contains(".pdf"))
-                            {
-                                string content = "";
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread.Start();
-                                thread.Join();
-                                f.content = content;
-                            }
+                                f.content = GetTextFromPDF(path);
                             else
                                 f.content = ReadFile(path);
 
@@ -183,19 +175,8 @@ namespace DirectoryMonitorService
                             fileInfo fileUpload = new fileInfo();
                             fileUpload.name = name;
                             fileUpload.path = path;
-
                             if (path.Contains(".pdf"))
-                            {
-                                string content = "";
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread.Start();
-                                thread.Join();
-                                fileUpload.content = content;
-                            }
-
+                                fileUpload.content = GetTextFromPDF(path);
                             else
                                 fileUpload.content = ReadFile(path);
 
@@ -270,17 +251,9 @@ namespace DirectoryMonitorService
                             fileInfo fileUpload = new fileInfo();
                             fileUpload.name = name;
                             fileUpload.path = path;
+
                             if (path.Contains(".pdf"))
-                            {
-                                string content = "";
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread.Start();
-                                thread.Join();
-                                fileUpload.content = content;
-                            }
+                                fileUpload.content = GetTextFromPDF(path);
                             else
                                 fileUpload.content = ReadFile(path);
 
@@ -342,15 +315,28 @@ namespace DirectoryMonitorService
 
         private static string GetTextFromPDF(string path)
         {
-            PdfReader reader = new PdfReader(path);
-            string text = string.Empty;
-            for (int page = 1; page <= reader.NumberOfPages; page++)
+            try
             {
-                text += PdfTextExtractor.GetTextFromPage(reader, page);
-            }
-            reader.Close();
+                string content = "";
+                Thread thread = new Thread(() =>
+                {
+                    PdfReader reader = new PdfReader(path);
+                    for (int page = 1; page <= reader.NumberOfPages; page++)
+                    {
+                        content += PdfTextExtractor.GetTextFromPage(reader, page);
+                    }
+                    reader.Close();
+                });
+                thread.Start();
+                thread.Join();
 
-            return text;
+                return content;
+            }
+            catch (IOException err)
+            {
+                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
+            }
+            return "";
         }
 
         private static void LogError(string err)
