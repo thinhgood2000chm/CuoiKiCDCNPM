@@ -140,6 +140,7 @@ namespace DirectoryMonitorService
                             {
                                 dao.Update(f, id);
                             }
+
                             // End Change
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -275,8 +276,7 @@ namespace DirectoryMonitorService
                 LogError("OnRenamed --- " + err.ToString() + "\n");
             }
         }// End OnRenamed
-
-        // END file system watcher
+        //=== END file system watcher
 
         //--- Support function
         // ReadFile Text
