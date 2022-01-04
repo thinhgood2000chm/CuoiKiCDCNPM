@@ -13,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DirectoryMonitorService.DAO;
 using Nest;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 
 namespace DirectoryMonitorService
 {
@@ -29,17 +31,14 @@ namespace DirectoryMonitorService
         // uninstall service: stop service -> installutil.exe -u DirectoryMonitorService.exe    |
         //--------------------------------------------------------------------------------------|
 
-        // TODO: singleton for write
-        // *docx problem*
-
         FileSystemWatcher[] fileSystemWatchers;
         // folders you don't want to apply file system watcher
-        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "\\iTProgram\\", "C:\\Users" };
+        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "elasticsearch", "kibana", "C:\\Users" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
         // file dao
         static fileDao dao = new fileDao();
-
+        
         public DirectoryMonitorService()
         {
             InitializeComponent();
@@ -60,31 +59,42 @@ namespace DirectoryMonitorService
                 // will be a fileSystemWatcher of each file type. B/c fileSystemWatcher don't support Filters in .Net Framework
                 foreach (string etx in extensions)
                 {
-                    FileSystemWatcher watcher = new FileSystemWatcher(strDrive)
+                    if (!Directory.Exists(strDrive))
                     {
-                        Filter = etx,
-                        EnableRaisingEvents = true,
-                        IncludeSubdirectories = true
-                    };
-                    // Will blogging when there is a change
-                    watcher.NotifyFilter = NotifyFilters.Attributes
-                                     | NotifyFilters.CreationTime
-                                     | NotifyFilters.DirectoryName
-                                     | NotifyFilters.FileName
-                                     | NotifyFilters.LastWrite
-                                     | NotifyFilters.Security
-                                     | NotifyFilters.Size;
+                        continue;
+                    }
+                    try
+                    {
+                        FileSystemWatcher watcher = new FileSystemWatcher(strDrive)
+                        {
+                            Filter = etx,
+                            EnableRaisingEvents = true,
+                            IncludeSubdirectories = true
+                        };
+                        // Will blogging when there is a change
+                        watcher.NotifyFilter = NotifyFilters.Attributes
+                                         | NotifyFilters.CreationTime
+                                         | NotifyFilters.DirectoryName
+                                         | NotifyFilters.FileName
+                                         | NotifyFilters.LastWrite
+                                         | NotifyFilters.Security
+                                         | NotifyFilters.Size;
 
-                    watcher.Changed += OnChanged;
-                    watcher.Created += OnCreated;
-                    watcher.Deleted += OnDeleted;
-                    watcher.Renamed += OnRenamed;
+                        watcher.Changed += OnChanged;
+                        watcher.Created += OnCreated;
+                        watcher.Deleted += OnDeleted;
+                        watcher.Renamed += OnRenamed;
 
-                    fileSystemWatchers[i] = watcher;
-                    i++;
+                        fileSystemWatchers[i] = watcher;
+                        i++;
+                    }
+                    catch (ArgumentException)
+                    {
+
+                    }
                 }
             }
-        }
+        }// End OnStart
 
         protected override void OnStop()
         {
@@ -95,152 +105,213 @@ namespace DirectoryMonitorService
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
-            // get service location
-            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
-            if (!ignoreFolder)
+            try
             {
-                // fix duplicate change event
-                string path = e.FullPath.ToString();
-                if (!path.Contains("elastic"))
+                // get service location
+                bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
+                if (!ignoreFolder)
                 {
-                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                    if (!fileWriteTime.ContainsKey(path) ||
-                        fileWriteTime[path].ToString() != currentLastWriteTime
-                        )
+                    // fix duplicate change event
+                    string path = e.FullPath.ToString();
+                    if (!path.Contains("elastic"))
                     {
-                        //-- Change on elastic
-                        string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                        string name = pathIncludeName[pathIncludeName.Length - 1];
-
-                        // read file
-                        fileInfo f = new fileInfo();
-                        f.name = name;
-                        f.path = path;
-                        f.content = ReadFile(path);
-                        /*if(path.Contains(".pdf"))
-							fileUpload.content = GetTextFromPDF(path);
-						else
-							fileUpload.content = ReadFile(path);*/
-
-                        // update elastic
-                        var id = dao.GetId(e.FullPath);
-                        if (id != null)
+                        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                        if (!fileWriteTime.ContainsKey(path) ||
+                            fileWriteTime[path].ToString() != currentLastWriteTime
+                            )
                         {
-                            dao.Update(f, id);
-                        }
-                        // End Change
+                            //-- Change on elastic
+                            string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                        fileWriteTime[path] = currentLastWriteTime;
+                            // read file
+                            fileInfo f = new fileInfo();
+                            f.name = name;
+                            f.path = path;
+                            if (path.Contains(".pdf"))
+                            {
+                                string content = "";
+                                Thread thread = new Thread(() =>
+                                {
+                                    content = GetTextFromPDF(path);
+                                });
+                                thread.Start();
+                                thread.Join();
+                                f.content = content;
+                            }
+                            else
+                                f.content = ReadFile(path);
+
+                            // update elastic
+                            var id = dao.GetId(e.FullPath);
+                            if (id != null)
+                            {
+                                dao.Update(f, id);
+                            }
+                            // End Change
+
+                            fileWriteTime[path] = currentLastWriteTime;
+                        }
                     }
                 }
             }
-        }
+            catch (FileNotFoundException err)
+            {
+                LogError("OnChanged --- " + err.ToString()+"\n");
+            }
+        } // End OnChanged
 
         private static void OnCreated(object sender, FileSystemEventArgs e)
         {
-            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
-            if (!ignoreFolder)
+            try
             {
-                string path = e.FullPath.ToString();
-                if (!path.Contains("elastic"))
+                bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
+                if (!ignoreFolder)
                 {
-                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                    if (!fileWriteTime.ContainsKey(path) ||
-                        fileWriteTime[path].ToString() != currentLastWriteTime
-                        )
+                    string path = e.FullPath.ToString();
+                    if (!path.Contains("elastic"))
                     {
-                        //-- Create on elastic
-                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                        string name = pathIncludeName[pathIncludeName.Length - 1];
+                        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                        if (!fileWriteTime.ContainsKey(path) ||
+                            fileWriteTime[path].ToString() != currentLastWriteTime
+                            )
+                        {
+                            //-- Create on elastic
+                            string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                        fileInfo fileUpload = new fileInfo();
-                        fileUpload.name = name;
-                        fileUpload.path = path;
-                        fileUpload.content = ReadFile(path);
-                        /*if(path.Contains(".pdf"))
-							fileUpload.content = GetTextFromPDF(path);
-						else
-							fileUpload.content = ReadFile(path);*/
+                            fileInfo fileUpload = new fileInfo();
+                            fileUpload.name = name;
+                            fileUpload.path = path;
 
-                        dao.Add(fileUpload);
-                        // End Create
+                            if (path.Contains(".pdf"))
+                            {
+                                string content = "";
+                                Thread thread = new Thread(() =>
+                                {
+                                    content = GetTextFromPDF(path);
+                                });
+                                thread.Start();
+                                thread.Join();
+                                fileUpload.content = content;
+                            }
 
-                        fileWriteTime[path] = currentLastWriteTime;
+                            else
+                                fileUpload.content = ReadFile(path);
+
+                            dao.Add(fileUpload);
+                            // End Create
+
+                            fileWriteTime[path] = currentLastWriteTime;
+                        }
                     }
                 }
             }
-        }
+            catch (FileNotFoundException err)
+            {
+                LogError("OnCreated --- " + err.ToString() + "\n");
+            }
+        }// End OnCreated
 
 
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
-            if (!ignoreFolder)
+            try
             {
-                string path = e.FullPath.ToString();
-                if (!path.Contains("elastic"))
+                bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
+                if (!ignoreFolder)
                 {
-                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                    if (!fileWriteTime.ContainsKey(path) ||
-                        fileWriteTime[path].ToString() != currentLastWriteTime
-                        )
+                    string path = e.FullPath.ToString();
+                    if (!path.Contains("elastic"))
                     {
-                        //-- Delete on elastic
-                        var id = dao.GetId(path);
-                        if (id != null)
+                        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                        if (!fileWriteTime.ContainsKey(path) ||
+                            fileWriteTime[path].ToString() != currentLastWriteTime
+                            )
                         {
-                            dao.Deleted(id);
-                        }
-                        // End Delete
+                            //-- Delete on elastic
+                            var id = dao.GetId(path);
+                            if (id != null)
+                            {
+                                dao.Deleted(id);
+                            }
+                            // End Delete
 
-                        fileWriteTime[path] = currentLastWriteTime;
+                            fileWriteTime[path] = currentLastWriteTime;
+                        }
                     }
                 }
             }
-        }
+            catch (FileNotFoundException err)
+            {
+                LogError("OnDeleted --- " + err.ToString() + "\n");
+            }
+        }// End OnDeleted
 
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
-            bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
-            if (!ignoreFolder)
+            try
             {
-                string path = e.FullPath.ToString();
-                if (!path.Contains("elastic"))
+                bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
+                if (!ignoreFolder)
                 {
-                    string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
-                    if (!fileWriteTime.ContainsKey(path) ||
-                        fileWriteTime[path].ToString() != currentLastWriteTime
-                        )
+                    string path = e.FullPath.ToString();
+                    if (!path.Contains("elastic"))
                     {
-                        //-- Rename on elastic
-                        string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                        string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
-
-                        fileInfo fileUpload = new fileInfo();
-                        fileUpload.name = name;
-                        fileUpload.path = path;
-                        var id = dao.GetId(e.OldFullPath);
-                        fileUpload.content = ReadFile(path);
-
-                        if (id != null)
+                        string currentLastWriteTime = File.GetLastWriteTime(e.FullPath).ToString();
+                        if (!fileWriteTime.ContainsKey(path) ||
+                            fileWriteTime[path].ToString() != currentLastWriteTime
+                            )
                         {
-                            dao.Update(fileUpload, id);
-                        }
-                        // End Rename
+                            //-- Rename on elastic
+                            string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
 
-                        fileWriteTime[path] = currentLastWriteTime;
+                            fileInfo fileUpload = new fileInfo();
+                            fileUpload.name = name;
+                            fileUpload.path = path;
+                            if (path.Contains(".pdf"))
+                            {
+                                string content = "";
+                                Thread thread = new Thread(() =>
+                                {
+                                    content = GetTextFromPDF(path);
+                                });
+                                thread.Start();
+                                thread.Join();
+                                fileUpload.content = content;
+                            }
+                            else
+                                fileUpload.content = ReadFile(path);
+
+
+                            var id = dao.GetId(e.OldFullPath);
+                            if (id != null)
+                            {
+                                dao.Update(fileUpload, id);
+                            }
+                            // End Rename
+
+                            fileWriteTime[path] = currentLastWriteTime;
+                        }
                     }
                 }
             }
-        }
+            catch (FileNotFoundException err)
+            {
+                LogError("OnRenamed --- " + err.ToString() + "\n");
+            }
+        }// End OnRenamed
+
         // END file system watcher
 
-        // Support function
+        //--- Support function
+        // ReadFile Text
         public static string ReadFile(string path)
         {
-            string content = "";
             try
             {
+                string content = "";
                 if (!path.Contains(".tmp"))
                 {// bỏ qua file tmp khi word đang được thay đổi
                     Thread thread = new Thread(() =>
@@ -254,19 +325,39 @@ namespace DirectoryMonitorService
                 }
 
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException err)
             {
-                File.AppendAllText($"C:\\log.txt", "\nFileNotFoundException\n" + path);
+                LogError("ReadFile text --- " + err.ToString() + "\n");
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException err)
             {
-                File.AppendAllText($"C:\\log.txt", "\nUnauthorizedAccessException\n" + path);
+                LogError("ReadFile text --- " + err.ToString() + "\n");
             }
-            catch (IOException e)
+            catch (IOException err)
             {
-                File.AppendAllText($"C:\\log.txt", "\nIOException " + e + "\n" + path);
+                LogError("ReadFile text --- " + err.ToString() + "\n");
             }
             return "";
+        }// End ReadFile
+
+        private static string GetTextFromPDF(string path)
+        {
+            PdfReader reader = new PdfReader(path);
+            string text = string.Empty;
+            for (int page = 1; page <= reader.NumberOfPages; page++)
+            {
+                text += PdfTextExtractor.GetTextFromPage(reader, page);
+            }
+            reader.Close();
+
+            return text;
         }
-    }
+
+        private static void LogError(string err)
+        {
+            var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            File.AppendAllText($"{serviceLocation}\\LogError.txt", err);
+        }
+
+    }// End Class DirectoryMonitorService
 }
