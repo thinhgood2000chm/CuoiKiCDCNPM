@@ -332,6 +332,14 @@ namespace DirectoryMonitorService
 
                 return content;
             }
+            catch (FileNotFoundException err)
+            {
+                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
+            }
+            catch (UnauthorizedAccessException err)
+            {
+                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
+            }
             catch (IOException err)
             {
                 LogError("GetTextFromPDF --- " + err.ToString() + "\n");
@@ -344,6 +352,8 @@ namespace DirectoryMonitorService
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             File.AppendAllText($"{serviceLocation}\\LogError.txt", err);
         }
+
+
 
     }// End Class DirectoryMonitorService
 }
