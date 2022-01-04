@@ -16,6 +16,7 @@ using Nest;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 using Path = System.IO.Path;
+using System.Runtime.InteropServices;
 
 namespace DirectoryMonitorService
 {
@@ -39,13 +40,21 @@ namespace DirectoryMonitorService
         static private Hashtable fileWriteTime = new Hashtable();
         // file dao
         static fileDao dao = new fileDao();
-        
+        // index elastic
+        static string index = "";
+
         public DirectoryMonitorService()
         {
             InitializeComponent();
         }
         protected override void OnStart(string[] args)
         {
+            // get index elastic
+            string systempath = Environment.GetEnvironmentVariable("SystemRoot");
+            string[] pathIncludeName = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+            string name = pathIncludeName[0];
+            index = ReadFile($"{name}\\data_key\\key.txt");
+            
             // get all drive in computer
             string[] drives = Environment.GetLogicalDrives();
 
@@ -129,16 +138,19 @@ namespace DirectoryMonitorService
                             fileInfo f = new fileInfo();
                             f.name = name;
                             f.path = path;
+                            // get content
+                            if (path.Contains(".txt"))
+                                f.content = ReadFile(path);
                             if (path.Contains(".pdf"))
                                 f.content = GetTextFromPDF(path);
-                            else
+                            if (path.Contains(".doc") || path.Contains(".docx"))
                                 f.content = ReadFile(path);
 
                             // update elastic
-                            var id = dao.GetId(e.FullPath);
+                            var id = dao.GetId(e.FullPath, index);
                             if (id != null)
                             {
-                                dao.Update(f, id);
+                                dao.Update(f, id, index);
                             }
 
                             // End Change
@@ -176,12 +188,15 @@ namespace DirectoryMonitorService
                             fileInfo fileUpload = new fileInfo();
                             fileUpload.name = name;
                             fileUpload.path = path;
+                            if (path.Contains(".txt"))
+                                fileUpload.content = ReadFile(path);
                             if (path.Contains(".pdf"))
                                 fileUpload.content = GetTextFromPDF(path);
-                            else
+                            if (path.Contains(".doc") || path.Contains(".docx"))
                                 fileUpload.content = ReadFile(path);
+                                
 
-                            dao.Add(fileUpload);
+                            dao.Add(fileUpload, index);
                             // End Create
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -212,10 +227,10 @@ namespace DirectoryMonitorService
                             )
                         {
                             //-- Delete on elastic
-                            var id = dao.GetId(path);
+                            var id = dao.GetId(path, index);
                             if (id != null)
                             {
-                                dao.Deleted(id);
+                                dao.Deleted(id, index);
                             }
                             // End Delete
 
@@ -253,16 +268,17 @@ namespace DirectoryMonitorService
                             fileUpload.name = name;
                             fileUpload.path = path;
 
+                            if (path.Contains(".txt"))
+                                fileUpload.content = ReadFile(path);
                             if (path.Contains(".pdf"))
                                 fileUpload.content = GetTextFromPDF(path);
-                            else
+                            if (path.Contains(".doc") || path.Contains(".docx"))
                                 fileUpload.content = ReadFile(path);
 
-
-                            var id = dao.GetId(e.OldFullPath);
+                            var id = dao.GetId(e.OldFullPath, index);
                             if (id != null)
                             {
-                                dao.Update(fileUpload, id);
+                                dao.Update(fileUpload, id, index);
                             }
                             // End Rename
 
@@ -346,13 +362,61 @@ namespace DirectoryMonitorService
             }
             return "";
         }
+        private static string GetTextFromDocx(object path)
+        {
+            try
+            {
+                string content = "";
+                LogError(path+ "1 \n");
+                Thread thread = new Thread(() =>
+                {
 
+                    Microsoft.Office.Interop.Word.Application word = new Microsoft.Office.Interop.Word.Application();
+                    object miss = System.Reflection.Missing.Value;
+                    object readOnly = true;
+                    Microsoft.Office.Interop.Word.Document docs = word.Documents.Open(ref path, ref miss, ref readOnly, ref miss, ref miss,
+                                ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss);
+
+                    LogError(path + "2 \n");
+                    LogError(docs.Paragraphs.Count + " 3333\n");
+                    for (int i = 0; i < docs.Paragraphs.Count; i++)
+                    {
+                        content += docs.Paragraphs[i + 1].Range.Text.ToString();
+                    }
+
+                    docs.Close();
+                    word.Quit();
+                });
+                thread.Start();
+                thread.Join();
+
+                return content;
+
+            }
+            catch (FileNotFoundException err)
+            {
+                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
+            }
+            catch (System.NullReferenceException err)
+            {
+                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
+            }
+            catch (COMException err)
+            {
+                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
+            }
+            catch (IOException err)
+            {
+                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
+            }
+            return "";
+
+        } // END GetTextFromDocx
         private static void LogError(string err)
         {
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             File.AppendAllText($"{serviceLocation}\\LogError.txt", err);
         }
-
 
 
     }// End Class DirectoryMonitorService
