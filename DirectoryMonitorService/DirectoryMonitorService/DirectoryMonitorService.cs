@@ -38,7 +38,7 @@ namespace DirectoryMonitorService
         static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "elasticsearch", "kibana", "C:\\Users", "\\data_key\\" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
-        // folder log
+        
         static string changeLogPath = "";
 
         public DirectoryMonitorService()
@@ -47,7 +47,7 @@ namespace DirectoryMonitorService
         }
         protected override void OnStart(string[] args)
         {
-            // get folder to log
+            // get changeLogPath
             string systempath = Environment.GetEnvironmentVariable("SystemRoot");
             string[] pathIncludeName = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
             string name = pathIncludeName[0];
