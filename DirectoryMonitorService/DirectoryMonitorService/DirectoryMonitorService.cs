@@ -129,7 +129,7 @@ namespace DirectoryMonitorService
                             )
                         {
                             //-- Log Change 
-                            var msg = $"OnChanged --- {e.FullPath} {System.Environment.NewLine}";
+                            var msg = $"OnChanged {e.FullPath} {System.Environment.NewLine}";
                             LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -159,7 +159,7 @@ namespace DirectoryMonitorService
                             )
                         {
                             //-- Log Create
-                            var msg = $"OnCreated --- {e.FullPath} {System.Environment.NewLine}";
+                            var msg = $"OnCreated {e.FullPath} {System.Environment.NewLine}";
                             LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -190,7 +190,7 @@ namespace DirectoryMonitorService
                             )
                         {
                             //-- Log Delete 
-                            var msg = $"OnDeleted --- {e.FullPath} {System.Environment.NewLine}";
+                            var msg = $"OnDeleted {e.FullPath} {System.Environment.NewLine}";
                             LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -220,7 +220,7 @@ namespace DirectoryMonitorService
                             )
                         {
                             //-- Log Renamed
-                            var msg = $"OnRenamed --- {e.OldFullPath} --- {e.FullPath} {System.Environment.NewLine}";
+                            var msg = $"OnRenamed {e.OldFullPath} {e.FullPath} {System.Environment.NewLine}";
                             LogWatcher(msg);
                             // End Renamed
 
