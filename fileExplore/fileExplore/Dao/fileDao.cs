@@ -2,6 +2,7 @@
 using Nest;
 using System.Collections.Generic;
 using System.Diagnostics;
+using fileExplore.FileInfoBuilder;
 
 namespace fileExplore.Dao
 {
@@ -27,9 +28,9 @@ namespace fileExplore.Dao
         {
             var myJson = new
             {
-                name = file.name,
-                path = file.path,
-                content = file.content
+                name = file.Name,
+                path = file.Path,
+                content = file.Content
             };
             var response = elasticClient.Index(myJson, i => i.Index(index));
             if (response.IsValid)
@@ -42,7 +43,7 @@ namespace fileExplore.Dao
         public bool CheckExits(string dataCheck, string index)
         {
             var res = elasticClient.Search<fileInfo>(s => s.Index(index)
-           .Query(q => q.Term(p => p.name.Suffix("keyword"), dataCheck)));
+           .Query(q => q.Term(p => p.Name.Suffix("keyword"), dataCheck)));
 
             if (res.Hits.Count > 0)
             {
@@ -54,7 +55,7 @@ namespace fileExplore.Dao
         public string GetId(string oldPath, string index)
         {
             var res = elasticClient.Search<fileInfo>(s => s.Index(index)
-            .Query(q=>q.Term(p=>p.path.Suffix("keyword"),oldPath)));
+            .Query(q=>q.Term(p=>p.Path.Suffix("keyword"),oldPath)));
 
 
             var id = "";
@@ -112,12 +113,9 @@ namespace fileExplore.Dao
 
             foreach (var hit in res.Hits)
             {
-                myList.Add(new fileInfo()
-                {
-                    name = hit.Source.name,
-                    path = hit.Source.path,
-                    content = hit.Source.content
-                });
+                InfoBuilder fileInfoBuilder = new InfoBuilder();
+                fileInfo fileInfo = fileInfoBuilder.AddName(hit.Source.Name).AddContent(hit.Source.Content).AddPath(hit.Source.Path).Build();
+                myList.Add(fileInfo);
             }
 
             return myList;

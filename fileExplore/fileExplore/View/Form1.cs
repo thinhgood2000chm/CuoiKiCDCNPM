@@ -14,6 +14,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Linq;
+using fileExplore.FileInfoBuilder;
 
 namespace fileExplore
 {
@@ -25,6 +26,8 @@ namespace fileExplore
         // constant
         string dataCheck = "dataforCheck11231asasdasdqweadaw";
         static string index = "";
+        static string dataLog = "";
+        static string nameDriver = "";
         List<fileInfo> ListJson = new List<fileInfo>();
 
         // FileSystemWatcher
@@ -32,8 +35,7 @@ namespace fileExplore
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
         static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "\\iTProgram\\", "C:\\Users" };
-        bool isProcessRunning = false; // cái này là của process bar 
-        ProgressDialog progressBar = new ProgressDialog();// cái này là của process bar 
+
         static fileDao dao = new fileDao();
         //list kiểm tra dã bấm vào cây hay chưa
         List<string> listPath = new List<string>();
@@ -48,58 +50,58 @@ namespace fileExplore
            string systempath = Environment.GetEnvironmentVariable("SystemRoot");
 
             string[] pathIncludeName = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-            string name = pathIncludeName[0];
+             nameDriver = pathIncludeName[0];
             bool checkExitsData = false;
 
             try
             {
-                // Application.persistentDataPath + "/player.data"
-                index = File.ReadAllText($"{name}\\data_key\\key.txt");
-                Debug.WriteLine("##############" + index);
+                index = File.ReadAllText($"{nameDriver}\\data_key\\key.txt");
+
                 checkExitsData = dao.CheckExits(dataCheck, index);
             }
             catch
             {
                 Guid g = Guid.NewGuid();
                 index = g.ToString();
-                string newFolderPath = $"{name}\\data_key";
+                string newFolderPath = $"{nameDriver}\\data_key";
                 bool exists = System.IO.Directory.Exists(newFolderPath);
                 if (!exists)
                 {
                     var folder = Directory.CreateDirectory(newFolderPath);
                     if (folder.Exists)
                     {
-                        File.WriteAllText($"{name}\\data_key\\key.txt", g.ToString());
+                        File.WriteAllText($"{nameDriver}\\data_key\\key.txt", g.ToString());
                     }
                 }
                 else
                 {
-                    File.WriteAllText($"{name}\\data_key\\key.txt", g.ToString());
+                    File.WriteAllText($"{nameDriver}\\data_key\\key.txt", g.ToString());
                 }
 
             }
+          
 
             PopulateTreeView();
           
             if (!checkExitsData)
             {
-                ListJson.Add(new fileInfo()
-                {
-                    name = dataCheck,
-                    path = "",
-                    content = "" // cái chỗ này sẽ đọc nội dung file ra nhưng chưa làm tới 
-                });
+                InfoBuilder fileInfoBuilder = new InfoBuilder();
+                fileInfo fileInfo = fileInfoBuilder.AddName(dataCheck).Build();
+                ListJson.Add(fileInfo);
 
                 Task subThreadForGetAllFile = new Task(() => getAllFileInDriver());
 
                 subThreadForGetAllFile.Start(); // cho tiến trình tìm file chạy 1 thread khác 
-                //progressBar.ShowDialog();
             }
-            else // choox này sẽ xoắ đi khi hoàn tất #################################################
+
+            else 
             {
                 txtInfo.Visible = false;
-                MessageBox.Show(" data ton tai");
+                //MessageBox.Show(" data ton tai");
                 //btnSearch.Enabled = true;
+                Task CheckEventChangeFile = new Task(() => CheckChangeFile());
+                CheckEventChangeFile.Start();
+   
             }
 
             this.treeViewEx.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.treeViewEx_NodeMouseClick);
@@ -148,10 +150,10 @@ namespace fileExplore
                                          | NotifyFilters.Security
                                          | NotifyFilters.Size;
 
-                 /*       watcher.Changed += OnChanged;
+                        watcher.Changed += OnChanged;
                         watcher.Created += OnCreated;
                         watcher.Deleted += OnDeleted;
-                        watcher.Renamed += OnRenamed;*/
+                        watcher.Renamed += OnRenamed;
 
                         fileSystemWatchers[i] = watcher;
                         i++;
@@ -222,7 +224,6 @@ namespace fileExplore
                  {
                      DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
                      //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
-                     //progressBar.UpdateProgress(i, info.GetDirectories().Length);
 
                      if (info.Exists)
                      {
@@ -237,19 +238,15 @@ namespace fileExplore
 
 
                  }*/
-            /* if (progressBar.InvokeRequired)
-                 progressBar.BeginInvoke(new Action(() => progressBar.Close()));
 
-             isProcessRunning = false;*/
-
-            if (IsHandleCreated)
+            if (IsHandleCreated) // check neeys như đã tiến hành chạy threadt thì mới chạy cá này để có thể đồng bộ được 
             {
                 txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
             }
 
 
-            var bulkIndexResponse = dao.AddList(ListJson, index);
+            var bulkIndexResponse = dao.AddList(ListJson, index); // gửi dữ liệu lên server elastic 
             if (bulkIndexResponse)
             {
                 txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
@@ -325,13 +322,10 @@ namespace fileExplore
                         {
                             content = File.ReadAllText(file.FullName);
                         }
-     
-                        ListJson.Add(new fileInfo()
-                        {
-                            name = file.Name,
-                            path = file.FullName,
-                            content = content // cái chỗ này sẽ đọc nội dung file ra nhưng chưa làm tới 
-                        });
+
+                        InfoBuilder fileInfoBuilder = new InfoBuilder();
+                        fileInfo fileInfo = fileInfoBuilder.AddName(file.Name).AddContent(file.FullName).AddPath(content).Build();
+                        ListJson.Add(fileInfo);
 
                         Debug.WriteLine(file.Name + "path = " + file.FullName);
 
@@ -452,12 +446,6 @@ namespace fileExplore
         {
             try
             {
-                string systempath = Environment.GetEnvironmentVariable("SystemRoot");
-
-                string[] pathSystem = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                string nameDriver = pathSystem[0];
-                index = File.ReadAllText($"{nameDriver}\\data_key\\key.txt");
-                // get service location
                 bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
                 if (!ignoreFolder)
                 {
@@ -474,42 +462,24 @@ namespace fileExplore
                             string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                             string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                            // read file
-                            fileInfo f = new fileInfo();
-                            f.name = name;
-                            f.path = path;
-                            //f.content = ReadFile(path);
                             string content = "";
+
+                            // get content
+                            if (path.Contains(".txt"))
+                                content = ReadFile(path);
                             if (path.Contains(".pdf"))
-                            {
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread.Start();
-                                thread.Join();
-                                f.content = content;
-                            }
-                            else if (path.Contains(".docx"))
-                            {
-                                Thread thread2 = new Thread(() =>
-                                {
-                                    content = GetTextFromDocx(path);
-                                });
-                                thread2.Start();
-                                thread2.Join();
-
-                                f.content = content;
-                            }
-                            else
-                                f.content = ReadFile(path);
-
+                                content = GetTextFromPDF(path);
+                            if (path.Contains(".doc") || path.Contains(".docx"))
+                                content = ReadFile(path);
+                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
                             // update elastic
                             var id = dao.GetId(e.FullPath, index);
                             if (id != null)
                             {
-                                dao.Update(f, id, index);
+                                dao.Update(fileInfo, id, index);
                             }
+
                             // End Change
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -529,11 +499,6 @@ namespace fileExplore
         {
             try
             {
-                string systempath = Environment.GetEnvironmentVariable("SystemRoot");
-
-                string[] pathSystem = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                string nameDriver = pathSystem[0];
-                index = File.ReadAllText($"{nameDriver}\\data_key\\key.txt");
                 bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
                 if (!ignoreFolder)
                 {
@@ -549,40 +514,17 @@ namespace fileExplore
                             string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                             string name = pathIncludeName[pathIncludeName.Length - 1];
 
-                            fileInfo fileUpload = new fileInfo();
-                            fileUpload.name = name;
-                            fileUpload.path = path;
                             string content = "";
+                            if (path.Contains(".txt"))
+                                content = ReadFile(path);
+                            if (path.Contains(".pdf"))
+                               content = GetTextFromPDF(path);
+                            if (path.Contains(".doc") || path.Contains(".docx"))
+                                content = ReadFile(path);
 
-                            if (path.Contains(".docx"))
-                            {
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromDocx(path);
-                                });
-                                thread.Start();
-                                thread.Join();
-
-                                fileUpload.content = content;
-                            }
-                            else if (path.Contains(".pdf"))
-                            {
-
-                                Thread thread2 = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread2.Start();
-                                thread2.Join();
-
-                                fileUpload.content = content;
-                            }
-                            else
-                            {
-                                fileUpload.content = ReadFile(path);
-                            }
-
-                            dao.Add(fileUpload, index);
+                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
+                            dao.Add(fileInfo, index);
                             // End Create
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -602,11 +544,7 @@ namespace fileExplore
         {
             try
             {
-                string systempath = Environment.GetEnvironmentVariable("SystemRoot");
 
-                string[] pathSystem = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                string nameDriver = pathSystem[0];
-                index = File.ReadAllText($"{nameDriver}\\data_key\\key.txt");
                 bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
                 if (!ignoreFolder)
                 {
@@ -642,11 +580,6 @@ namespace fileExplore
         {
             try
             {
-                string systempath = Environment.GetEnvironmentVariable("SystemRoot");
-
-                string[] pathSystem = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                string nameDriver = pathSystem[0];
-                index = File.ReadAllText($"{nameDriver}\\data_key\\key.txt");
                 bool ignoreFolder = pathIgnore.Any(e.FullPath.Contains);
                 if (!ignoreFolder)
                 {
@@ -662,45 +595,23 @@ namespace fileExplore
                             string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
                             string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
 
-                            fileInfo fileUpload = new fileInfo();
-                            fileUpload.name = name;
-                            fileUpload.path = path;
                             string content = "";
-                            if (path.Contains(".docx"))
-                            {
-                                Thread thread = new Thread(() =>
-                                {
-                                    content = GetTextFromDocx(path);
-                                });
-                                thread.Start();
-                                thread.Join();
+                            if (path.Contains(".txt"))
+                                content = ReadFile(path);
+                            if (path.Contains(".pdf"))
+                               content = GetTextFromPDF(path);
+                            if (path.Contains(".doc") || path.Contains(".docx"))
+                                content = ReadFile(path);
 
-                                fileUpload.content = content;
-                            }
-                            else if (path.Contains(".pdf"))
-                            {
 
-                                Thread thread2 = new Thread(() =>
-                                {
-                                    content = GetTextFromPDF(path);
-                                });
-                                thread2.Start();
-                                thread2.Join();
-
-                                fileUpload.content = content;
-                            }
-                            else
-                            {
-                                fileUpload.content = ReadFile(path);
-                            }
-
+                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
                             var id = dao.GetId(e.OldFullPath, index);
                             if (id != null)
                             {
-                                var is_success = dao.Update(fileUpload, id, index);
-
+                                dao.Update(fileInfo, id, index);
                             }
-
+                            // End Rename
 
                             fileWriteTime[path] = currentLastWriteTime;
                         }
@@ -735,14 +646,13 @@ namespace fileExplore
             var searchDatas = dao.Search(text, index);
             foreach (var data in searchDatas)
             {
-                Debug.WriteLine("data"+data.name);
 
-                item = new ListViewItem(data.name, 1);
+                item = new ListViewItem(data.Name, 1);
                 subItems = new ListViewItem.ListViewSubItem[]
                     {new ListViewItem.ListViewSubItem(item, "File"),
                         new ListViewItem.ListViewSubItem(item,
                            ""),
-                        new ListViewItem.ListViewSubItem(item,data.path)};
+                        new ListViewItem.ListViewSubItem(item,data.Path)};
                 item.SubItems.AddRange(subItems);
                 listView1.Items.Add(item);
             }
@@ -938,7 +848,74 @@ namespace fileExplore
             return "";
       
         }
+        private void CheckChangeFile()
+        {
+            try
+            {
 
+                using (StreamReader file = new StreamReader($"{nameDriver}\\data_key\\log.txt"))
+                {
+                    Debug.WriteLine("da vao");
+                    string ln;
+
+                    while ((ln = file.ReadLine()) != null)
+                    {
+                        if (ln.Contains("CREATE"))
+                        {
+                            string[] lnData = ln.Split(' ');
+                            string path = lnData[lnData.Length - 1];
+                            string[] listPathName = path.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string namefile = listPathName[listPathName.Length - 1];
+                            Debug.WriteLine(path, namefile);
+                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            string content = "";
+                       /*     if (namefile.Contains(".pdf"))
+                            {
+                                content = GetTextFromPDF(path);
+                            }
+                            else if (namefile.Contains(".docx"))
+                            {
+                                content = GetTextFromDocx(path);
+                            }
+                            else
+                            {
+                                content = File.ReadAllText(path);
+                            }*/
+                            fileInfo fileInfo = fileInfoBuilder.AddName(namefile).AddContent("").AddPath(path).Build();
+                            Thread threadAdd = new Thread(()=>dao.Add(fileInfo, index));
+                            threadAdd.Start();
+                
+
+
+                        }
+                        if (ln.Contains("DELETE"))
+                        {
+                            string[] lnData = ln.Split(' ');
+                            string path = lnData[lnData.Length - 1];
+                            string[] listPathName = path.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string namefile = listPathName[listPathName.Length - 1];
+                            Debug.WriteLine(path, namefile);
+                        }
+                        if (ln.Contains("RENAME"))
+                        {
+                            string[] lnData = ln.Split(' ');
+                            string oldPath = lnData[1];
+                            string newPath = lnData[2];
+                            Debug.WriteLine(lnData.Length);
+                            string[] listPathName = newPath.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
+                            string namefile = listPathName[listPathName.Length - 1];
+                            Debug.WriteLine("old " + oldPath + "new " + newPath + "new " + namefile);
+                        }
+                    }
+                    file.Close();
+                }
+
+            }
+            catch (IOException)
+            {
+
+            }
+        }
         private static string GetTextFromDocx(object path)
         {
 

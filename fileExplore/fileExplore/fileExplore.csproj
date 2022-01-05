@@ -70,7 +70,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dao\fileDao.cs" />
-    <Compile Include="Dao\fileInfo.cs" />
+    <Compile Include="FileInfoBuilder\fileInfo.cs" />
+    <Compile Include="FileInfoBuilder\InfoBuilder.cs" />
+    <Compile Include="FileInfoBuilder\IFileInfoBuilder.cs" />
     <Compile Include="View\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
