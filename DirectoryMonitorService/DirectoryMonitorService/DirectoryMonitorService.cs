@@ -35,13 +35,11 @@ namespace DirectoryMonitorService
 
         FileSystemWatcher[] fileSystemWatchers;
         // folders you don't want to apply file system watcher
-        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "elasticsearch", "kibana", "C:\\Users" };
+        static private string[] pathIgnore = { "\\$RECYCLE.BIN\\", "C:\\ProgramData\\", "elasticsearch", "kibana", "C:\\Users", "\\data_key\\" };
         // fix duplicate change event
         static private Hashtable fileWriteTime = new Hashtable();
-        // file dao
-        static fileDao dao = new fileDao();
-        // index elastic
-        static string index = "";
+        // folder log
+        static string changeLogPath = "";
 
         public DirectoryMonitorService()
         {
@@ -49,12 +47,12 @@ namespace DirectoryMonitorService
         }
         protected override void OnStart(string[] args)
         {
-            // get index elastic
+            // get folder to log
             string systempath = Environment.GetEnvironmentVariable("SystemRoot");
             string[] pathIncludeName = systempath.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
             string name = pathIncludeName[0];
-            index = ReadFile($"{name}\\data_key\\key.txt");
-            
+            changeLogPath = name + "\\data_key\\ChangeLog.txt";
+
             // get all drive in computer
             string[] drives = Environment.GetLogicalDrives();
 
@@ -98,9 +96,9 @@ namespace DirectoryMonitorService
                         fileSystemWatchers[i] = watcher;
                         i++;
                     }
-                    catch (ArgumentException)
+                    catch (ArgumentException err)
                     {
-
+                        LogError("FileSystemWatcher --- " + err.ToString() + "\n");
                     }
                 }
             }
@@ -130,30 +128,9 @@ namespace DirectoryMonitorService
                             fileWriteTime[path].ToString() != currentLastWriteTime
                             )
                         {
-                            //-- Change on elastic
-                            string[] pathIncludeName = e.Name.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string name = pathIncludeName[pathIncludeName.Length - 1];
-
-                            // read file
-                            fileInfo f = new fileInfo();
-                            f.name = name;
-                            f.path = path;
-                            // get content
-                            if (path.Contains(".txt"))
-                                f.content = ReadFile(path);
-                            if (path.Contains(".pdf"))
-                                f.content = GetTextFromPDF(path);
-                            if (path.Contains(".doc") || path.Contains(".docx"))
-                                f.content = ReadFile(path);
-
-                            // update elastic
-                            var id = dao.GetId(e.FullPath, index);
-                            if (id != null)
-                            {
-                                dao.Update(f, id, index);
-                            }
-
-                            // End Change
+                            //-- Log Change 
+                            var msg = $"OnChanged --- {e.FullPath} {System.Environment.NewLine}";
+                            LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
                         }
@@ -181,23 +158,9 @@ namespace DirectoryMonitorService
                             fileWriteTime[path].ToString() != currentLastWriteTime
                             )
                         {
-                            //-- Create on elastic
-                            string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string name = pathIncludeName[pathIncludeName.Length - 1];
-
-                            fileInfo fileUpload = new fileInfo();
-                            fileUpload.name = name;
-                            fileUpload.path = path;
-                            if (path.Contains(".txt"))
-                                fileUpload.content = ReadFile(path);
-                            if (path.Contains(".pdf"))
-                                fileUpload.content = GetTextFromPDF(path);
-                            if (path.Contains(".doc") || path.Contains(".docx"))
-                                fileUpload.content = ReadFile(path);
-                                
-
-                            dao.Add(fileUpload, index);
-                            // End Create
+                            //-- Log Create
+                            var msg = $"OnCreated --- {e.FullPath} {System.Environment.NewLine}";
+                            LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
                         }
@@ -226,13 +189,9 @@ namespace DirectoryMonitorService
                             fileWriteTime[path].ToString() != currentLastWriteTime
                             )
                         {
-                            //-- Delete on elastic
-                            var id = dao.GetId(path, index);
-                            if (id != null)
-                            {
-                                dao.Deleted(id, index);
-                            }
-                            // End Delete
+                            //-- Log Delete 
+                            var msg = $"OnDeleted --- {e.FullPath} {System.Environment.NewLine}";
+                            LogWatcher(msg);
 
                             fileWriteTime[path] = currentLastWriteTime;
                         }
@@ -260,27 +219,10 @@ namespace DirectoryMonitorService
                             fileWriteTime[path].ToString() != currentLastWriteTime
                             )
                         {
-                            //-- Rename on elastic
-                            string[] pathIncludeName = e.Name.Split('\\');// name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string name = pathIncludeName[pathIncludeName.Length - 1];// sau khi split sẽ ra được mảng chứa name( name luôn nằm ở vị trí cuối cùng )
-
-                            fileInfo fileUpload = new fileInfo();
-                            fileUpload.name = name;
-                            fileUpload.path = path;
-
-                            if (path.Contains(".txt"))
-                                fileUpload.content = ReadFile(path);
-                            if (path.Contains(".pdf"))
-                                fileUpload.content = GetTextFromPDF(path);
-                            if (path.Contains(".doc") || path.Contains(".docx"))
-                                fileUpload.content = ReadFile(path);
-
-                            var id = dao.GetId(e.OldFullPath, index);
-                            if (id != null)
-                            {
-                                dao.Update(fileUpload, id, index);
-                            }
-                            // End Rename
+                            //-- Log Renamed
+                            var msg = $"OnRenamed --- {e.OldFullPath} --- {e.FullPath} {System.Environment.NewLine}";
+                            LogWatcher(msg);
+                            // End Renamed
 
                             fileWriteTime[path] = currentLastWriteTime;
                         }
@@ -295,129 +237,16 @@ namespace DirectoryMonitorService
         //=== END file system watcher
 
         //--- Support function
-        // ReadFile Text
-        public static string ReadFile(string path)
-        {
-            try
-            {
-                string content = "";
-                if (!path.Contains(".tmp"))
-                {// bỏ qua file tmp khi word đang được thay đổi
-                    Thread thread = new Thread(() =>
-                    {
-                        content = File.ReadAllText(path);
-                    });
-                    thread.Start();
-                    thread.Join();
-                    //content = 
-                    return content;
-                }
 
-            }
-            catch (FileNotFoundException err)
-            {
-                LogError("ReadFile text --- " + err.ToString() + "\n");
-            }
-            catch (UnauthorizedAccessException err)
-            {
-                LogError("ReadFile text --- " + err.ToString() + "\n");
-            }
-            catch (IOException err)
-            {
-                LogError("ReadFile text --- " + err.ToString() + "\n");
-            }
-            return "";
-        }// End ReadFile
-
-        private static string GetTextFromPDF(string path)
-        {
-            try
-            {
-                string content = "";
-                Thread thread = new Thread(() =>
-                {
-                    PdfReader reader = new PdfReader(path);
-                    for (int page = 1; page <= reader.NumberOfPages; page++)
-                    {
-                        content += PdfTextExtractor.GetTextFromPage(reader, page);
-                    }
-                    reader.Close();
-                });
-                thread.Start();
-                thread.Join();
-
-                return content;
-            }
-            catch (FileNotFoundException err)
-            {
-                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
-            }
-            catch (UnauthorizedAccessException err)
-            {
-                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
-            }
-            catch (IOException err)
-            {
-                LogError("GetTextFromPDF --- " + err.ToString() + "\n");
-            }
-            return "";
-        }
-        private static string GetTextFromDocx(object path)
-        {
-            try
-            {
-                string content = "";
-                LogError(path+ "1 \n");
-                Thread thread = new Thread(() =>
-                {
-
-                    Microsoft.Office.Interop.Word.Application word = new Microsoft.Office.Interop.Word.Application();
-                    object miss = System.Reflection.Missing.Value;
-                    object readOnly = true;
-                    Microsoft.Office.Interop.Word.Document docs = word.Documents.Open(ref path, ref miss, ref readOnly, ref miss, ref miss,
-                                ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss, ref miss);
-
-                    LogError(path + "2 \n");
-                    LogError(docs.Paragraphs.Count + " 3333\n");
-                    for (int i = 0; i < docs.Paragraphs.Count; i++)
-                    {
-                        content += docs.Paragraphs[i + 1].Range.Text.ToString();
-                    }
-
-                    docs.Close();
-                    word.Quit();
-                });
-                thread.Start();
-                thread.Join();
-
-                return content;
-
-            }
-            catch (FileNotFoundException err)
-            {
-                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
-            }
-            catch (System.NullReferenceException err)
-            {
-                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
-            }
-            catch (COMException err)
-            {
-                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
-            }
-            catch (IOException err)
-            {
-                LogError("GetTextFromDocx --- " + err.ToString() + "\n");
-            }
-            return "";
-
-        } // END GetTextFromDocx
         private static void LogError(string err)
         {
             var serviceLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             File.AppendAllText($"{serviceLocation}\\LogError.txt", err);
         }
 
-
+        private static void LogWatcher(string msg)
+        {
+            File.AppendAllText(changeLogPath, msg);
+        }
     }// End Class DirectoryMonitorService
 }
