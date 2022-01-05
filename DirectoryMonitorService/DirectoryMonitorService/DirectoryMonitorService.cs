@@ -11,7 +11,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DirectoryMonitorService.DAO;
 using Nest;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;

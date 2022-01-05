@@ -83,8 +83,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DAO\fileDao.cs" />
-    <Compile Include="DAO\fileInfo.cs" />
     <Compile Include="DirectoryMonitorService.cs">
       <SubType>Component</SubType>
     </Compile>
