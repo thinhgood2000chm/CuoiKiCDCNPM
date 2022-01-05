@@ -478,6 +478,11 @@ namespace fileExplore
                             if (id != null)
                             {
                                 dao.Update(fileInfo, id, index);
+                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
+                                {
+                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
+                                }
+                               
                             }
 
                             // End Change
@@ -525,6 +530,10 @@ namespace fileExplore
                             InfoBuilder fileInfoBuilder = new InfoBuilder();
                             fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
                             dao.Add(fileInfo, index);
+                            if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
+                            {
+                                File.Delete($"{nameDriver}\\data_key\\log.txt");
+                            }
                             // End Create
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -561,6 +570,10 @@ namespace fileExplore
                             if (id != null)
                             {
                                 dao.Deleted(id, index);
+                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
+                                {
+                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
+                                }
                             }
                             // End Delete
 
@@ -610,6 +623,10 @@ namespace fileExplore
                             if (id != null)
                             {
                                 dao.Update(fileInfo, id, index);
+                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
+                                {
+                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
+                                }
                             }
                             // End Rename
 
@@ -908,6 +925,7 @@ namespace fileExplore
                         }
                     }
                     file.Close();
+                    File.Delete($"{nameDriver}\\data_key\\log.txt");
                 }
 
             }
