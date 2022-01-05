@@ -99,8 +99,6 @@ namespace fileExplore
                 txtInfo.Visible = false;
                 //MessageBox.Show(" data ton tai");
                 //btnSearch.Enabled = true;
-                Task CheckEventChangeFile = new Task(() => CheckChangeFile());
-                CheckEventChangeFile.Start();
    
             }
 
@@ -324,7 +322,7 @@ namespace fileExplore
                         }
 
                         InfoBuilder fileInfoBuilder = new InfoBuilder();
-                        fileInfo fileInfo = fileInfoBuilder.AddName(file.Name).AddContent(file.FullName).AddPath(content).Build();
+                        fileInfo fileInfo = fileInfoBuilder.AddName(file.Name).AddContent(content).AddPath(file.FullName).Build();
                         ListJson.Add(fileInfo);
 
                         Debug.WriteLine(file.Name + "path = " + file.FullName);
@@ -472,16 +470,12 @@ namespace fileExplore
                             if (path.Contains(".doc") || path.Contains(".docx"))
                                 content = ReadFile(path);
                             InfoBuilder fileInfoBuilder = new InfoBuilder();
-                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             // update elastic
                             var id = dao.GetId(e.FullPath, index);
                             if (id != null)
                             {
                                 dao.Update(fileInfo, id, index);
-                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
-                                {
-                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
-                                }
                                
                             }
 
@@ -528,12 +522,8 @@ namespace fileExplore
                                 content = ReadFile(path);
 
                             InfoBuilder fileInfoBuilder = new InfoBuilder();
-                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             dao.Add(fileInfo, index);
-                            if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
-                            {
-                                File.Delete($"{nameDriver}\\data_key\\log.txt");
-                            }
                             // End Create
 
                             fileWriteTime[path] = currentLastWriteTime;
@@ -570,10 +560,6 @@ namespace fileExplore
                             if (id != null)
                             {
                                 dao.Deleted(id, index);
-                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
-                                {
-                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
-                                }
                             }
                             // End Delete
 
@@ -618,15 +604,11 @@ namespace fileExplore
 
 
                             InfoBuilder fileInfoBuilder = new InfoBuilder();
-                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(path).AddPath(content).Build();
+                            fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             var id = dao.GetId(e.OldFullPath, index);
                             if (id != null)
                             {
                                 dao.Update(fileInfo, id, index);
-                                if (File.Exists($"{nameDriver}\\data_key\\log.txt"))
-                                {
-                                    File.Delete($"{nameDriver}\\data_key\\log.txt");
-                                }
                             }
                             // End Rename
 
@@ -865,75 +847,7 @@ namespace fileExplore
             return "";
       
         }
-        private void CheckChangeFile()
-        {
-            try
-            {
-
-                using (StreamReader file = new StreamReader($"{nameDriver}\\data_key\\log.txt"))
-                {
-                    Debug.WriteLine("da vao");
-                    string ln;
-
-                    while ((ln = file.ReadLine()) != null)
-                    {
-                        if (ln.Contains("CREATE"))
-                        {
-                            string[] lnData = ln.Split(' ');
-                            string path = lnData[lnData.Length - 1];
-                            string[] listPathName = path.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string namefile = listPathName[listPathName.Length - 1];
-                            Debug.WriteLine(path, namefile);
-                            InfoBuilder fileInfoBuilder = new InfoBuilder();
-                            string content = "";
-                       /*     if (namefile.Contains(".pdf"))
-                            {
-                                content = GetTextFromPDF(path);
-                            }
-                            else if (namefile.Contains(".docx"))
-                            {
-                                content = GetTextFromDocx(path);
-                            }
-                            else
-                            {
-                                content = File.ReadAllText(path);
-                            }*/
-                            fileInfo fileInfo = fileInfoBuilder.AddName(namefile).AddContent("").AddPath(path).Build();
-                            Thread threadAdd = new Thread(()=>dao.Add(fileInfo, index));
-                            threadAdd.Start();
-                
-
-
-                        }
-                        if (ln.Contains("DELETE"))
-                        {
-                            string[] lnData = ln.Split(' ');
-                            string path = lnData[lnData.Length - 1];
-                            string[] listPathName = path.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string namefile = listPathName[listPathName.Length - 1];
-                            Debug.WriteLine(path, namefile);
-                        }
-                        if (ln.Contains("RENAME"))
-                        {
-                            string[] lnData = ln.Split(' ');
-                            string oldPath = lnData[1];
-                            string newPath = lnData[2];
-                            Debug.WriteLine(lnData.Length);
-                            string[] listPathName = newPath.Split('\\'); // name này bao gồm cả folder trước nó nên cần tách ra lấy name 
-                            string namefile = listPathName[listPathName.Length - 1];
-                            Debug.WriteLine("old " + oldPath + "new " + newPath + "new " + namefile);
-                        }
-                    }
-                    file.Close();
-                    File.Delete($"{nameDriver}\\data_key\\log.txt");
-                }
-
-            }
-            catch (IOException)
-            {
-
-            }
-        }
+      
         private static string GetTextFromDocx(object path)
         {
 
