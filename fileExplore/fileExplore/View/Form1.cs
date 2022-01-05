@@ -85,7 +85,7 @@ namespace fileExplore
           
             if (!checkExitsData)
             {
-                InfoBuilder fileInfoBuilder = new InfoBuilder();
+                IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                 fileInfo fileInfo = fileInfoBuilder.AddName(dataCheck).Build();
                 ListJson.Add(fileInfo);
 
@@ -321,7 +321,7 @@ namespace fileExplore
                             content = File.ReadAllText(file.FullName);
                         }
 
-                        InfoBuilder fileInfoBuilder = new InfoBuilder();
+                        IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                         fileInfo fileInfo = fileInfoBuilder.AddName(file.Name).AddContent(content).AddPath(file.FullName).Build();
                         ListJson.Add(fileInfo);
 
@@ -469,7 +469,7 @@ namespace fileExplore
                                 content = GetTextFromPDF(path);
                             if (path.Contains(".doc") || path.Contains(".docx"))
                                 content = ReadFile(path);
-                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                             fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             // update elastic
                             var id = dao.GetId(e.FullPath, index);
@@ -521,7 +521,7 @@ namespace fileExplore
                             if (path.Contains(".doc") || path.Contains(".docx"))
                                 content = ReadFile(path);
 
-                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                             fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             dao.Add(fileInfo, index);
                             // End Create
@@ -603,7 +603,7 @@ namespace fileExplore
                                 content = ReadFile(path);
 
 
-                            InfoBuilder fileInfoBuilder = new InfoBuilder();
+                            IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                             fileInfo fileInfo = fileInfoBuilder.AddName(name).AddContent(content).AddPath(path).Build();
                             var id = dao.GetId(e.OldFullPath, index);
                             if (id != null)

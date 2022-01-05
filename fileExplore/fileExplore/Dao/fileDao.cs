@@ -113,7 +113,7 @@ namespace fileExplore.Dao
 
             foreach (var hit in res.Hits)
             {
-                InfoBuilder fileInfoBuilder = new InfoBuilder();
+                IFileInfoBuilder fileInfoBuilder = new InfoBuilder();
                 fileInfo fileInfo = fileInfoBuilder.AddName(hit.Source.Name).AddContent(hit.Source.Content).AddPath(hit.Source.Path).Build();
                 myList.Add(fileInfo);
             }
