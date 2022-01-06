@@ -175,16 +175,16 @@ namespace fileExplore
             // 
             // label1
             // 
-            this.label1.BackColor = System.Drawing.Color.IndianRed;
+            this.label1.BackColor = System.Drawing.Color.MediumAquamarine;
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.label1.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Bisque;
-            this.label1.Location = new System.Drawing.Point(151, 27);
+            this.label1.Location = new System.Drawing.Point(102, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 30);
+            this.label1.Size = new System.Drawing.Size(119, 30);
             this.label1.TabIndex = 6;
-            this.label1.Text = "Data";
+            this.label1.Text = "Data search";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
@@ -251,7 +251,7 @@ namespace fileExplore
             // button1
             // 
             this.button1.BackColor = System.Drawing.Color.IndianRed;
-            this.button1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.button1.Location = new System.Drawing.Point(236, 96);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(99, 23);
@@ -263,7 +263,7 @@ namespace fileExplore
             // SortbyDate
             // 
             this.SortbyDate.BackColor = System.Drawing.Color.IndianRed;
-            this.SortbyDate.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.SortbyDate.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.SortbyDate.Location = new System.Drawing.Point(382, 96);
             this.SortbyDate.Name = "SortbyDate";
             this.SortbyDate.Size = new System.Drawing.Size(99, 23);
@@ -275,7 +275,7 @@ namespace fileExplore
             // button3
             // 
             this.button3.BackColor = System.Drawing.Color.IndianRed;
-            this.button3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button3.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.button3.Location = new System.Drawing.Point(529, 96);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(99, 23);

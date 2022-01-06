@@ -41,6 +41,7 @@ namespace fileExplore
         List<string> listPath = new List<string>();
         //biến dùng để luuw lại thông tin của parent root trước đó
         DirectoryInfo parentDirInfo;
+        TreeNode treeNode;
         public Form1()
         {
             InitializeComponent();
@@ -196,7 +197,7 @@ namespace fileExplore
         public void getAllFileInDriver()
         {
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\test\");
+            DirectoryInfo info = new DirectoryInfo(@"G:\");
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
@@ -206,36 +207,36 @@ namespace fileExplore
             {
                 Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
                 task.Start();
-                GetFileInFolder(info);
+                // GetFileInFolder(info);
                 task.Wait();
             }
 
 
 
             // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
-            /*     var ListDriverInfor = DriveInfo.GetDrives();
-                 if (IsHandleCreated)
-                 {
-                     btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
-                 }
-                 for (int i = 0; i < ListDriverInfor.Length; i++)
-                 {
-                     DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
-                     //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
+  /*          var ListDriverInfor = DriveInfo.GetDrives();
+            if (IsHandleCreated)
+            {
+                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+            }
+            for (int i = 0; i < ListDriverInfor.Length; i++)
+            {
+                DirectoryInfo info = new DirectoryInfo(ListDriverInfor[i].Name);
+                //Debug.WriteLine(i+" "+ info.GetDirectories().Length);
 
-                     if (info.Exists)
-                     {
+                if (info.Exists)
+                {
 
-                         Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                         task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
+                    Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                    task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
 
-                         GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
-                         task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
+                    //GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
+                    task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
 
-                     }
+                }
 
 
-                 }*/
+            }*/
 
             if (IsHandleCreated) // check neeys như đã tiến hành chạy threadt thì mới chạy cá này để có thể đồng bộ được 
             {
@@ -309,7 +310,6 @@ namespace fileExplore
                         string content = "";
                         if(file.Extension == ".pdf")
                         {
-                            Debug.WriteLine("da vao");
                             content = GetTextFromPDF(file.FullName);
                         }
                         else if(file.Extension == ".docx")
@@ -402,6 +402,7 @@ namespace fileExplore
         private void treeViewEx_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeNode newSelected = e.Node;
+            treeNode = newSelected;
             DirectoryInfo nodeDirInfo = (DirectoryInfo)newSelected.Tag;
             parentDirInfo = nodeDirInfo; // lưu lại parent root để truy suất ngược lại khi cần ( dùng khi muốn load lại listview)
             
@@ -538,7 +539,6 @@ namespace fileExplore
 
         }
 
-
         private static void OnDeleted(object sender, FileSystemEventArgs e)
         {
             try
@@ -608,6 +608,7 @@ namespace fileExplore
                             var id = dao.GetId(e.OldFullPath, index);
                             if (id != null)
                             {
+                                Debug.WriteLine(id);
                                 dao.Update(fileInfo, id, index);
                             }
                             // End Rename
@@ -737,7 +738,7 @@ namespace fileExplore
                     {new ListViewItem.ListViewSubItem(item, "Directory"),
                         new ListViewItem.ListViewSubItem(item,
                             dir.LastAccessTime.ToShortDateString()),
-                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)};
                 item.SubItems.AddRange(subItems);
                 listView1.Items.Add(item);
             }
@@ -804,6 +805,9 @@ namespace fileExplore
                 {
                    var folder =  Directory.CreateDirectory(newFolderPath);
                     AddItemToListView(parentDirInfo);
+                    treeNode.Nodes.Clear();// xóa cây trong node hiện tại đi 
+                    GetDirectories(parentDirInfo.GetDirectories(), treeNode); // load lại node đó để tải dữ liệu mới 
+
                 }
                 else
                 {
