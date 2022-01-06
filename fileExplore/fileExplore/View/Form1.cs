@@ -883,6 +883,109 @@ namespace fileExplore
        
         }
 
+        private void sortByNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
+            listView1.Items.Clear();
+            ListViewItem.ListViewSubItem[] subItems;
+            ListViewItem item = null;
+            if(parentDirInfo!= null)
+            {
+                foreach (DirectoryInfo dir in parentDirInfo.GetDirectories().OrderBy(f => f.Name))
+                {
+                    item = new ListViewItem(dir.Name, 0);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        {new ListViewItem.ListViewSubItem(item, "Directory"),
+                        new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+                foreach (FileInfo file in parentDirInfo.GetFiles().OrderBy(f => f.Name))
+                {
+                    item = new ListViewItem(file.Name, 1);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        { new ListViewItem.ListViewSubItem(item, "File"),
+                        new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,file.FullName)};
+
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+            }
+            
+        }
+
+        private void sortByDateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            listView1.Items.Clear();
+            ListViewItem.ListViewSubItem[] subItems;
+            ListViewItem item = null;
+            if(parentDirInfo != null)
+            {
+                foreach (DirectoryInfo dir in parentDirInfo.GetDirectories().OrderBy(f => f.LastAccessTime))
+                {
+                    item = new ListViewItem(dir.Name, 0);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        {new ListViewItem.ListViewSubItem(item, "Directory"),
+                        new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+                foreach (FileInfo file in parentDirInfo.GetFiles().OrderBy(f => f.LastAccessTime))
+                {
+                    item = new ListViewItem(file.Name, 1);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        { new ListViewItem.ListViewSubItem(item, "File"),
+                        new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,file.FullName)};
+
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+            }
+            
+        }
+
+        private void sortBySizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            listView1.Items.Clear();
+            ListViewItem.ListViewSubItem[] subItems;
+            ListViewItem item = null;
+
+            if(parentDirInfo != null)
+            {
+                foreach (DirectoryInfo dir in parentDirInfo.GetDirectories())
+                {
+                    item = new ListViewItem(dir.Name, 0);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        {new ListViewItem.ListViewSubItem(item, "Directory"),
+                        new ListViewItem.ListViewSubItem(item,
+                            dir.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,dir.FullName)}; // thêm dòng này
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+                foreach (FileInfo file in parentDirInfo.GetFiles().OrderBy(f => f.Length))
+                {
+                    item = new ListViewItem(file.Name, 1);
+                    subItems = new ListViewItem.ListViewSubItem[]
+                        { new ListViewItem.ListViewSubItem(item, "File"),
+                        new ListViewItem.ListViewSubItem(item,
+                        file.LastAccessTime.ToShortDateString()),
+                        new ListViewItem.ListViewSubItem(item,file.FullName)};
+
+                    item.SubItems.AddRange(subItems);
+                    listView1.Items.Add(item);
+                }
+            }
+           
+        }
     }
 }

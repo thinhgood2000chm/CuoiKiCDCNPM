@@ -49,6 +49,12 @@ namespace fileExplore
             this.txtInfo = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.treeViewEx = new System.Windows.Forms.TreeView();
+            this.sortByNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
+            this.SortbyDate = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.sortByDateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortBySizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -111,35 +117,38 @@ namespace fileExplore
             this.renameToolStripMenuItem,
             this.deleteToolStripMenuItem,
             this.newFileToolStripMenuItem,
-            this.newFolderToolStripMenuItem});
+            this.newFolderToolStripMenuItem,
+            this.sortByNameToolStripMenuItem,
+            this.sortByDateToolStripMenuItem,
+            this.sortBySizeToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(133, 92);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(145, 158);
             // 
             // renameToolStripMenuItem
             // 
             this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
-            this.renameToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.renameToolStripMenuItem.Text = "Rename";
             this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click_1);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // newFileToolStripMenuItem
             // 
             this.newFileToolStripMenuItem.Name = "newFileToolStripMenuItem";
-            this.newFileToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.newFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newFileToolStripMenuItem.Text = "New file";
             this.newFileToolStripMenuItem.Click += new System.EventHandler(this.newFileToolStripMenuItem_Click);
             // 
             // newFolderToolStripMenuItem
             // 
             this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
-            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newFolderToolStripMenuItem.Text = "New folder";
             this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.newFolderToolStripMenuItem_Click);
             // 
@@ -175,7 +184,7 @@ namespace fileExplore
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(70, 30);
             this.label1.TabIndex = 6;
-            this.label1.Text = "Path";
+            this.label1.Text = "Data";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
@@ -184,13 +193,16 @@ namespace fileExplore
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.button3);
+            this.panel1.Controls.Add(this.SortbyDate);
+            this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.txtInfo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.txtFindText);
             this.panel1.Controls.Add(this.btnSearch);
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(832, 102);
+            this.panel1.Size = new System.Drawing.Size(832, 122);
             this.panel1.TabIndex = 10;
             // 
             // txtInfo
@@ -229,6 +241,63 @@ namespace fileExplore
             this.treeViewEx.TabIndex = 0;
             this.treeViewEx.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewEx_AfterSelect);
             // 
+            // sortByNameToolStripMenuItem
+            // 
+            this.sortByNameToolStripMenuItem.Name = "sortByNameToolStripMenuItem";
+            this.sortByNameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sortByNameToolStripMenuItem.Text = "Sort by name";
+            this.sortByNameToolStripMenuItem.Click += new System.EventHandler(this.sortByNameToolStripMenuItem_Click);
+            // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.Color.IndianRed;
+            this.button1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button1.Location = new System.Drawing.Point(236, 96);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(99, 23);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Sort by name";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.sortByNameToolStripMenuItem_Click);
+            // 
+            // SortbyDate
+            // 
+            this.SortbyDate.BackColor = System.Drawing.Color.IndianRed;
+            this.SortbyDate.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.SortbyDate.Location = new System.Drawing.Point(382, 96);
+            this.SortbyDate.Name = "SortbyDate";
+            this.SortbyDate.Size = new System.Drawing.Size(99, 23);
+            this.SortbyDate.TabIndex = 11;
+            this.SortbyDate.Text = "Sort by date";
+            this.SortbyDate.UseVisualStyleBackColor = false;
+            this.SortbyDate.Click += new System.EventHandler(this.sortByDateToolStripMenuItem_Click);
+            // 
+            // button3
+            // 
+            this.button3.BackColor = System.Drawing.Color.IndianRed;
+            this.button3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button3.Location = new System.Drawing.Point(529, 96);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(99, 23);
+            this.button3.TabIndex = 12;
+            this.button3.Text = "Sort by size";
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.sortBySizeToolStripMenuItem_Click);
+            // 
+            // sortByDateToolStripMenuItem
+            // 
+            this.sortByDateToolStripMenuItem.Name = "sortByDateToolStripMenuItem";
+            this.sortByDateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sortByDateToolStripMenuItem.Text = "Sort by date";
+            this.sortByDateToolStripMenuItem.Click += new System.EventHandler(this.sortByDateToolStripMenuItem_Click);
+            // 
+            // sortBySizeToolStripMenuItem
+            // 
+            this.sortBySizeToolStripMenuItem.Name = "sortBySizeToolStripMenuItem";
+            this.sortBySizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sortBySizeToolStripMenuItem.Text = "Sort by size";
+            this.sortBySizeToolStripMenuItem.Click += new System.EventHandler(this.sortBySizeToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -266,6 +335,12 @@ namespace fileExplore
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.ToolStripMenuItem newFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sortByNameToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button SortbyDate;
+        private System.Windows.Forms.ToolStripMenuItem sortByDateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sortBySizeToolStripMenuItem;
     }
 }
 
