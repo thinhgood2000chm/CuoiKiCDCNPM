@@ -196,25 +196,25 @@ namespace fileExplore
         // tiến hành chạy để lấy file gửi lên server 
         public void getAllFileInDriver()
         {
+            // code chạy để test trên 1 ổ đĩa
+            /*      DirectoryInfo info = new DirectoryInfo(@"G:\");
+                  if (IsHandleCreated)
+                  {
+                      btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
+                  }
 
-            DirectoryInfo info = new DirectoryInfo(@"G:\");
-            if (IsHandleCreated)
-            {
-                btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
-            }
-
-            if (info.Exists)
-            {
-                Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
-                task.Start();
-                // GetFileInFolder(info);
-                task.Wait();
-            }
+                  if (info.Exists)
+                  {
+                      Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
+                      task.Start();
+                      // GetFileInFolder(info);
+                      task.Wait();
+                  }*/
 
 
 
-            // dưới này là chạy tất cả file trên hệ thống, nếu muốn test có thể mở comment dưới này và đống đống code bên trên lại để thử, hiện tại thử trên 1 folder nào đó nhỏ cho nhanh
-  /*          var ListDriverInfor = DriveInfo.GetDrives();
+            // dưới này là chạy tất cả file trên hệ thống
+            var ListDriverInfor = DriveInfo.GetDrives();
             if (IsHandleCreated)
             {
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = false; })); //đồng bộ để có thể thiết lập disble cho button 
@@ -229,18 +229,17 @@ namespace fileExplore
 
                     Task task = new Task(() => RecursiveGetFile(info.GetDirectories()));
                     task.Start();// trong thread của tiến trình lấy all file tạo ra 1 thread khác để có thể xử lý bất đồng bộ
-
-                    //GetFileInFolder(info);// riêng cho thread này để ko ảnh hưởng đến thread main 
                     task.Wait(); // xử lý bất đồng bộ, buộc phải đợi thread hiện tại trong subThreadForGetAllFile chạy xong mới tạo mới thread khác 
 
                 }
 
 
-            }*/
+            }
 
-            if (IsHandleCreated) // check neeys như đã tiến hành chạy threadt thì mới chạy cá này để có thể đồng bộ được 
+            if (IsHandleCreated) // check nếu như đã tiến hành chạy threadt thì mới chạy cá này để có thể đồng bộ được 
             {
-                txtInfo.Invoke(new Action(() => txtInfo.Visible = false));
+                // khi load hết các file thì sẽ tắt dòng thông báo load file lên server và enable nút search 
+                txtInfo.Invoke(new Action(() => txtInfo.Visible = false)); // 
                 btnSearch.Invoke(new Action(() => { btnSearch.Enabled = true; }));
             }
 
@@ -274,7 +273,7 @@ namespace fileExplore
                     {
 
                         RecursiveGetFile(subSubDirs);// cái này gọi là đệ quy sau khi tìm xong 1 folder sẽ tiếp tục tìm kiếm lại trong folder con của folder đó xem có còn file hay folder nào nữa ko 
-                                                   // bắt sự kiện click thì mới gọi đệ quy 
+            
                     }
 
                 }
@@ -382,7 +381,7 @@ namespace fileExplore
 
                 try
                 {
-                    nodeToAddTo.Nodes.Add(aNode);// add folder vào ổ đĩa 
+                    nodeToAddTo.Nodes.Add(aNode);// add node vào cây 
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -438,7 +437,6 @@ namespace fileExplore
 
         }
 
-        // hiện tại sẽ viết tạm ở phần dưới này các chức năng như xóa sửa 
 
         //--- file system watcher
         private static void OnChanged(object sender, FileSystemEventArgs e)
